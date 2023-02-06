@@ -16,27 +16,11 @@ AShooterPlayerController::AShooterPlayerController()
 void AShooterPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AShooterPlayerController::BeginPlay()
 {
-	Super::BeginPlay();
-
-	/*
-	// Check HUDOverlayClass Variable
-	if (HUDOverlayClass)
-	{
-		// Create Instance of HUDOverlayClass and store it in HUDOverlay
-		HUDOverlay = CreateWidget<UUserWidget>(this, HUDOverlayClass);
-		
-		if (HUDOverlay)
-		{
-			HUDOverlay->AddToViewport();
-			HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
-	*/
+	Super::BeginPlay();		
 }
 
 // Call this when player Exits shop // AND PLayer start the game
@@ -44,14 +28,12 @@ void AShooterPlayerController::BeginStartLevelCountDown()
 {
 	// Call show Contdown
 	ShowCountDownNumber();
-	float CountDownTime = 2.9f;
+	float CountDownTime = 2.999f; // Almost 3 // Usinging Ceil in UI Function
 	GetWorldTimerManager().SetTimer(CountDownTimerHandle,this, &AShooterPlayerController::Callback_BeginStartLevelCountDown, CountDownTime, false);
-
 }
 
 void AShooterPlayerController::Callback_BeginStartLevelCountDown()
-{
-	
+{	
 	// Stop Showing Countdown Number on Screen
 	FinishedCountDown();
 	if (LevelSpawner)
@@ -148,9 +130,7 @@ void AShooterPlayerController::Finished_WaveTimer()
 			// open Shopmenu
 			LevelFinished();
 		}
-	}
-	
-	
+	}	
 }
 
 void AShooterPlayerController::PrepareNextWaveOnSpawner()
@@ -170,10 +150,8 @@ void AShooterPlayerController::PrepareNextWaveOnSpawner()
 float AShooterPlayerController::GetCountDownTime()
 {
 	if (GetWorldTimerManager().IsTimerActive(CountDownTimerHandle))
-	{
-		
+	{		
 		return GetWorldTimerManager().GetTimerRemaining(CountDownTimerHandle);
-
 	}
 	return 0.f;
 
@@ -183,12 +161,9 @@ float AShooterPlayerController::GetLevelCountDownTime()
 {
 	if (GetWorldTimerManager().IsTimerActive(WaveTimerHandle))
 	{
-
 		return GetWorldTimerManager().GetTimerRemaining(WaveTimerHandle);
-
 	}
 	return 0.f;
-
 }
 
 
@@ -212,9 +187,7 @@ void AShooterPlayerController::LevelFinished()
 			// clean up level
 			DestroyRemaindActorsInWorld();
 		}
-	}
-	
-		
+	}		
 }
 
 void AShooterPlayerController::DestroyRemaindActorsInWorld()
@@ -234,9 +207,7 @@ void AShooterPlayerController::DestroyRemaindActorsInWorld()
 		FoundActors[i]->Destroy();
 	}
 	FoundActors.Empty();
-
 }
-
 
 void AShooterPlayerController::MovePlayerToStartArea()
 {	
@@ -247,3 +218,18 @@ void AShooterPlayerController::MovePlayerToStartArea()
 	}
 }
 
+void AShooterPlayerController::ShowEndScreen_Lost()
+{
+	EndScreenWidgetInstance = CreateWidget(this, EndScreenWidget);
+
+	if (EndScreenWidgetInstance)
+	{
+		// Set InputMethode
+		FInputModeUIOnly Mode;
+		Mode.SetWidgetToFocus(EndScreenWidgetInstance->GetCachedWidget());
+		SetInputMode(Mode);
+
+		EndScreenWidgetInstance->AddToViewport();
+		bShowMouseCursor = true;
+	}
+}

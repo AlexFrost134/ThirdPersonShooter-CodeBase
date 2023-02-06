@@ -515,14 +515,11 @@ private:
 
 	// The Factor the Damage Amount gets Multiplied
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true", EditCondition = bOverrideWeaponProperties))
-	float LuckyHitMultiplier;
-
-	
+	float LuckyHitMultiplier;	
 
 public:// GetSet Function
 
 	void PostBeginPlayerIntialisierung(EItemRarity ItemTier, EWeaponType InWeaponType);
-
 
 	// Sets Owner of the Weapon
 	void SetNewOwner(AShooterCharacter* NewOwner);

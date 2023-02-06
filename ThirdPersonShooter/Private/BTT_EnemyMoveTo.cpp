@@ -8,8 +8,7 @@
 
 UBTT_EnemyMoveTo::UBTT_EnemyMoveTo(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	NodeName = "MoveToCustom";
-	
+	NodeName = "MoveToCustom";	
 }
 
 EBTNodeResult::Type UBTT_EnemyMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -28,10 +27,14 @@ EBTNodeResult::Type UBTT_EnemyMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerC
 		UE_LOG(AILog, Warning, TEXT("%s: Owner Null"), *OwnerComp.GetName());
 		return  EBTNodeResult::Failed;
 	}
+
 	// Set Radius
 	SetAcceptableRadius(Owner->GetAIAcceptableRadius());
 
-	//UE_LOG(AILog, Warning, TEXT("AcceptableRadius is: %f on %s"), AcceptableRadius, *Owner->GetActorLabel());
+#if EDITOR 
+	UE_LOG(AILog, Warning, TEXT("AcceptableRadius is: %f on %s"), AcceptableRadius, *Owner->GetActorLabel());
+#endif
+
 	// Overriding Default Calculation in Parent Constructor
 	// This should make sure that the ObservedBlackboardValueTolerance is corecct calculated
 	ObservedBlackboardValueTolerance = AcceptableRadius * 0.95f;

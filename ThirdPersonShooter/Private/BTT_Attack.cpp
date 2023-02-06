@@ -15,23 +15,11 @@ UBTT_Attack::UBTT_Attack(const FObjectInitializer& ObjectInitializer)
 
 
 EBTNodeResult::Type UBTT_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
-{
-    //// Watch for sideeffect, unsure for now!
-    //if(!bDataInitialized)
-    //{
-    //    // Referenz to the AIController
-    //     AIController = Cast<AEnemyAIController>(OwnerComp.GetAIOwner());
-    //    // Referenz to the Owner
-    //     Owner = Cast<AEnemy>(AIController->GetPawn());
-    //    // Only Do cast Once
-    //     bDataInitialized = true;
-    //}
-
+{    
    auto AIController = Cast<AEnemyAIController>(OwnerComp.GetAIOwner());
 
     // Referenz to the Owner
    auto  Owner = Cast<AEnemy>(AIController->GetPawn());
-
 
     if (!AIController)
     {
@@ -49,7 +37,9 @@ EBTNodeResult::Type UBTT_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, 
     UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
     if (!BlackboardComp)
     {
-       // UE_LOG(AILog, Warning, TEXT("%s: BlackboardComp Null on: BBT_Attack"),  *Owner->GetActorLabel());
+    #if EDITOR 
+        UE_LOG(AILog, Warning, TEXT("%s: BlackboardComp Null on: BBT_Attack"),  *Owner->GetActorLabel());
+    #endif
         return  EBTNodeResult::Failed;
     }
       
@@ -59,6 +49,8 @@ EBTNodeResult::Type UBTT_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, 
        return EBTNodeResult::Succeeded;
    }
 
-   //UE_LOG(AILog, Warning, TEXT("%s: Animation failed on: BBT_Attack"), *Owner->GetActorLabel());
+#if EDITOR 
+    UE_LOG(AILog, Warning, TEXT("%s: Animation failed on: BBT_Attack"), *Owner->GetActorLabel());
+#endif
    return  EBTNodeResult::Failed;
 }

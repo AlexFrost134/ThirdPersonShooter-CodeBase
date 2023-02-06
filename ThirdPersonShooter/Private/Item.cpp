@@ -2,10 +2,8 @@
 
 
 #include "Item.h"
-
 #include "DroppableItem.h"
 #include "Ammunition.h"
-
 #include "Components/BoxComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -18,9 +16,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "ShooterCharacter.h"
-
-
-
 
 // Sets default values
 AItem::AItem()
@@ -85,18 +80,12 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
+	HidePickUpWidget();
 	
-	//Hide PickUp Widget
-	if (PickupWidget)
-	{
-		PickupWidget->SetVisibility(false);
-	}
-
 	// Set activ Stars Array based on Rarity
 	SetActiveStars();
-		
+	
 	AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
-
 	AreaSphere->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereEndOverlap);
 
 	SetItemProperties(ItemState);
@@ -107,16 +96,13 @@ void AItem::BeginPlay()
 	// Set Custom Depth to Disabled
 	InitializeCutomDepth();
 
-	StartPulseTimer();
-	
+	StartPulseTimer();	
 }
 
 void AItem::OnConstruction(const FTransform& Transform)
 {
-
 	if (ItemRarityDataTable)
 	{
-
 		FItemRarityTable* Row = nullptr;
 
 		switch (ItemRarity)
@@ -148,7 +134,6 @@ void AItem::OnConstruction(const FTransform& Transform)
 		}
 		if (Row)
 		{
-
 			// Assign Variables with Values form the DataTable
 			GlowColor = Row->GlowColor;
 			LightColor = Row->LightColor;
@@ -157,16 +142,12 @@ void AItem::OnConstruction(const FTransform& Transform)
 			IconBackground = Row->IconBackground;
 			CustomDepthStencil = Row->CustomDepthStencil;
 
-
-
 			// Set Stencile Value, depending form the Value of the DataTable
 			if (GetItemMesh())
 			{
 				GetItemMesh()->SetCustomDepthStencilValue(CustomDepthStencil);
 			}
-
 		}
-
 	}
 
 	CreateDynamicMaterial();
@@ -183,8 +164,6 @@ void AItem::Tick(float DeltaTime)
 
 	// Get curve values form PulseCurve and set dynamic material parameter
 	UpdatePulse();
-
-	
 }
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -195,7 +174,6 @@ void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		if (ShooterCharacter)
 		{
 			ShooterCharacter->IncrementOverlappedItemCount(1);
-
 		}
 	}
 }
@@ -255,17 +233,14 @@ void AItem::SetActiveStars()
 			ActiveStars[5] = true;
 			break;
 	}
-
 }
 
 void AItem::SetItemProperties(EItemState state)
-{
-	
+{	
 	switch (state)
-	{
-	
-		case EItemState::EIS_Default:
-					
+	{	
+		case EItemState::EIS_Default:		
+			break;
 
 		case EItemState::EIS_OnGround:
 			// Set Mesh Properties
@@ -353,10 +328,8 @@ void AItem::SetItemProperties(EItemState state)
 			// CollisionBox
 			CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 			CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			break;
-					
+			break;					
 	}
-
 }
 
 void AItem::FinishInterpolation()
@@ -372,7 +345,6 @@ void AItem::FinishInterpolation()
 		// UnhighlightInventorySlot for Ui Animation
 		PlayerCharacter->UnHighlightInventorySlot(); 
 	}
-
 	// Set Scale back to normal
 	SetActorScale3D(FVector(1.f));
 
@@ -381,7 +353,6 @@ void AItem::FinishInterpolation()
 
 	DisableGlowMaterial();
 	DisableCustomDepth();
-
 }
 
 FVector AItem::GetInterpLocation()
@@ -408,9 +379,9 @@ FVector AItem::GetInterpLocation()
 		case EItemType::EIT_Default:
 			return PlayerCharacter->GetInterpLocationArray(0).SceneComponent->GetComponentLocation();
 			break;
-		
+		default:
+			break;		
 	}
-
 	return FVector(0.f);
 }
 
@@ -450,8 +421,6 @@ void AItem::InitializeCutomDepth()
 	DisableCustomDepth();
 }
 
-
-
 void AItem::CreateDynamicMaterial()
 {
 	if (MaterialInstance)
@@ -472,9 +441,7 @@ void AItem::EnableGlowMaterial()
 
 void AItem::SetGlowMaterialProperties()
 {
-	// virtual
-	
-	
+	// virtual	
 }
 
 void AItem::ResetPulseTimer()
@@ -524,6 +491,9 @@ void AItem::UpdatePulse()
 
 		case EItemState::EIS_Default:
 			break;
+
+		default:
+			break;
 	}
 	if (DynamicMaterialInstance)
 	{
@@ -531,14 +501,13 @@ void AItem::UpdatePulse()
 		DynamicMaterialInstance->SetScalarParameterValue(TEXT("GlowAmount"), CurveValue.X * GlowAmount);
 		DynamicMaterialInstance->SetScalarParameterValue(TEXT("FresnelExponent"), CurveValue.Y * FresnelExponent);
 
-		// Does not look Good, Maybe further tweakig can fix it, for now it is allright.
+		// Does not look good, Maybe further tweakig can fix it, for now it is allright.
 		// DynamicMaterialInstance->SetScalarParameterValue(TEXT("FresnelReflectFraction"), CurveValue.Z * FresnelReflectFraction);
 	}
 }
 
 void AItem::HandleDestory()
-{
-	
+{	
 	Destroy();
 }
 
@@ -589,7 +558,6 @@ void AItem::StartItemCurve(AShooterCharacter* Character)
 
 	GetWorldTimerManager().SetTimer(ItemInterpolationTimer, this, &AItem::FinishInterpolation, ZCurveTime);
 
-
 	// Get Inital Yaw of the Camera
 	const float CameraRotationYaw = Character->GetCameraComp()->GetComponentRotation().Yaw;
 	// Get inital Yaw of the Item
@@ -600,7 +568,6 @@ void AItem::StartItemCurve(AShooterCharacter* Character)
 	// Make that the outline effect is still in effect althoug the object is no longer the Target
 	// Switches after finishing interping
 	bCanChangeCustomDepth = false;
-
 }
 
 void AItem::ItemInterpolation(float DeltaTime)
@@ -617,8 +584,7 @@ void AItem::ItemInterpolation(float DeltaTime)
 		{
 			bLocalRotationResetDone = true;
 			// Reset Local Mesh Rotation to 0,0,0
-			ItemSkeletalMesh->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
-			
+			ItemSkeletalMesh->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));			
 		}
 
 		// Elapsed time since we started ItemInterpTimer
@@ -643,10 +609,8 @@ void AItem::ItemInterpolation(float DeltaTime)
 		const FVector ItemCurrentLocation = GetActorLocation();
 
 		//DrawDebugBox(GetWorld(), ItemCurrentLocation, FVector(10.f), FColor::Yellow, true); // temp
-
-		// Interpolated X value
+				
 		float InterpXValue = FMath::FInterpTo(ItemCurrentLocation.X, TargetInterpLocation.X, DeltaTime, 10.f);	
-		// Interpolated Y value
 		float InterpYValue = FMath::FInterpTo(ItemCurrentLocation.Y, TargetInterpLocation.Y, DeltaTime, 10.f);
 		
 		// Set X and Y ItemLocation to Interped Values
@@ -656,8 +620,7 @@ void AItem::ItemInterpolation(float DeltaTime)
 
 		// Adding curve value to the Z Component of the initial Location, (scaled by DeltaZ)
 		FinalLocation.Z = FinalLocation.Z + CurveValue * DeltaZ;
-		SetActorLocation(FinalLocation, true, nullptr, ETeleportType::TeleportPhysics);
-				
+		SetActorLocation(FinalLocation, true, nullptr, ETeleportType::TeleportPhysics);				
 
 		/// Rotation
 		// Camera Rotation this frame
@@ -666,15 +629,13 @@ void AItem::ItemInterpolation(float DeltaTime)
 		FRotator NewItemRoataion = { 0.f, CameraRotation.Yaw + InterpolationInitialYawOffset, 0.f };
 		SetActorRotation(NewItemRoataion, ETeleportType::TeleportPhysics);
 
-		/// Scale
+		/// Set Scale of the Item Based on ElapsedTime
 		if (ItemScaleCurve)
 		{
 			float ScaleCurveValue = ItemScaleCurve->GetFloatValue(ElapsedTime);
 			SetActorScale3D(FVector(ScaleCurveValue));
 		}
-
 	}
-
 }
 
 UWidgetComponent* AItem::GetPickUpWidget() 
@@ -688,4 +649,11 @@ void AItem::SetItemState(EItemState State)
 	SetItemProperties(ItemState);
 }
 
-
+void AItem::HidePickUpWidget()
+{
+	//Hide PickUp Widget
+	if (PickupWidget)
+	{
+		PickupWidget->SetVisibility(false);
+	}
+}

@@ -17,11 +17,7 @@ class THIRDPERSONSHOOTER_API UBTT_Attack : public UBTTaskNode
 private:
 	bool bDataInitialized;
 
-	/*class AEnemyAIController* AIController;
-	class AEnemy* Owner;*/
-
 public:
-
 	// Constructor
 	UBTT_Attack(const FObjectInitializer& ObjectInitializer);
 

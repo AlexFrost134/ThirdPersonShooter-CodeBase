@@ -47,18 +47,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,  meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* StaticMesh;
 
-	//// Easy Enemy
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Setup", meta = (AllowPrivateAccess = "true", BlueprintBaseOnly = "true"))
-	//TSoftClassPtr<class AEnemy> MiniEnemy;
-	//
-	//// Medius Big Ass Enemy
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Setup", meta = (AllowPrivateAccess = "true", BlueprintBaseOnly = "true"))
-	//TSoftClassPtr<AEnemy> StandardEnemy;
-
-	//// Big Ass Enemy
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Setup", meta = (AllowPrivateAccess = "true", BlueprintBaseOnly = "true"))
-	//TSoftClassPtr<AEnemy> BigEnemy;
-
 	// Easy Enemy
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Setup", meta = (AllowPrivateAccess = "true", BlueprintBaseOnly = "true"))
 	TSubclassOf<class AEnemy> SmallEnemy;
@@ -103,9 +91,7 @@ private:
 
 	// Timer Handle that callback to SpawnControll(). Fires first Time Starting a Wave
 	FTimerHandle SpawnTimerHandle;
-
 	
-
 	// Spawn Location if no Location could be determined, For now only X and Y Coordinates will be used. z is taken from tis Actor Location
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true", MakeEditWidget = "true", DisplayPriority = "1", Delta = 10))
 	FVector FallBackSpawnLocation;
@@ -131,9 +117,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true"))
 	int32 StartLevel;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	//float LeftCountDownTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true"))
 	float SpawnDelayAfterPreSpawnEffect;
@@ -163,10 +146,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* PreSpawnLightFlashEnemyDangerous;
 
-
 	// Ref to the Player that is set in the Begin of the Level for faster Access
 	class AShooterCharacter* PlayerCharacter;
-
 
 protected:
 	// Called when the game starts or when spawned
@@ -214,13 +195,11 @@ protected:
 	UClass* ChooseEnemyToSpawn();
 
 	// Fill Array
-	void InitzializeEnemyArray();
-	
+	void InitzializeEnemyArray();	
 
 	void AddEnemyToList(int32 MiniEnemyCount, int32 BigEnemyCount, int32 AmountOfStandardEnemy);
 
 	void SpawnControll();
-
 	
 public:	
 	// Called every frame

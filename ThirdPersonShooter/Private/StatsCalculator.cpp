@@ -87,10 +87,9 @@ float StatsCalculator::ApplyArmorPierced(float InDamage, float InArmor)
 	return DamagePiercedThroughArmor;
 }
 
+// Need to Move code, that only are used either by Enemy or Shooter, no need to have it here
 float StatsCalculator::CalculateDamage(FHitZone& HitZone)
 {
-	
-
 	float DamageAmount = 0.f;
 	float AdversaryArmorValue = 0.f;
 	bool bDamageFromEnemy = false;
@@ -116,16 +115,14 @@ float StatsCalculator::CalculateDamage(FHitZone& HitZone)
 
 	// Damage from Player
 	if (InstigatorChar)
-	{
-		
-		DamageAmount = StatsCalculator::DamageFromCharacter(HitZone);
-		
+	{		
+		DamageAmount = StatsCalculator::DamageFromCharacter(HitZone);		
 	}
+
 	// Damage from Enemy
 	if (InstigatorEnemy) 
 	{
-		DamageAmount = StatsCalculator::DamageFromEnemy(InstigatorEnemy);
-			
+		DamageAmount = StatsCalculator::DamageFromEnemy(InstigatorEnemy);			
 	}
 	
 	/// Add Modifer
@@ -149,7 +146,9 @@ float StatsCalculator::DamageFromCharacter(FHitZone& HitZone)
 	{
 		if (HitZone.DamageMultiplier <= .000'1f)
 		{
-			//UE_LOG(CombatLog, Error, TEXT("DamageMultiplier not set on %s"), *HitZone.DamagedActor->GetActorLabel());
+#if EDITOR 
+			UE_LOG(CombatLog, Error, TEXT("DamageMultiplier not set on %s"), *HitZone.DamagedActor->GetActorLabel());
+#endif
 			HitZone.DamageMultiplier = 1.f;
 		}
 
@@ -167,13 +166,18 @@ float StatsCalculator::DamageFromCharacter(FHitZone& HitZone)
 		// GetBaseDamage
 		if (Character->GetEquippedWeapon())
 		{
-			Damage = Character->GetEquippedWeapon()->GetWeaponDamage() *( 1 + (Character->GetPlayerStats().AttackDamagePercentage / 100)); //STATSNOTIFY
+			//STATSNOTIFY
+			float AdditionalDamgeFactor = (1 + (Character->GetPlayerStats().AttackDamagePercentage / 100));
+			Damage = Character->GetEquippedWeapon()->GetWeaponDamage() * AdditionalDamgeFactor;
 		}
 	
 		// Random Chance of a CriticalHit
 		if (Character->GetEquippedWeapon()->RollLuckyHit())
 		{
-			LuckyHitMultiplier = Character->GetEquippedWeapon()->GetLuckyHitMultiplier();
+			//STATSNOTIFY
+			float AdditionalLuck = Character->GetPlayerStats().Luck;
+
+			LuckyHitMultiplier = Character->GetEquippedWeapon()->GetLuckyHitMultiplier() + (AdditionalLuck / 10);
 			HitZone.bLuckyHit = true;
 		}
 

@@ -7,7 +7,7 @@ struct FHitZone
 {
 	GENERATED_BODY()
 
-		// Constructor
+	// Constructor
 	FHitZone()
 	{
 		DamageMultiplier = 0.f;
@@ -20,11 +20,11 @@ struct FHitZone
 
 	// The DamageMultiplier of the Enemy of this Zone
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float DamageMultiplier;
+	float DamageMultiplier;
 
 	// The Enemy Armor Value of the this HitZone
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float EnemyArmor;
+	float EnemyArmor;
 
 	// Damage Causer
 	AActor* InstigatorRef;
@@ -34,16 +34,16 @@ struct FHitZone
 
 	// Hold the PhysicalMaterial of the HitZone
 	UPROPERTY()
-		UPhysicalMaterial* PhysicalMaterial;
+	UPhysicalMaterial* PhysicalMaterial;
 
 	// Flags
 	// This Hit is a Lucky Hit
 	UPROPERTY()
-		bool bLuckyHit;
+	bool bLuckyHit;
 
 	// This Hit is on a CriticalZone
 	UPROPERTY()
-		bool bCriticalHitZone;
+	bool bCriticalHitZone;
 
 };
 
@@ -63,12 +63,12 @@ struct FPlayerStats
 		LifeSteal = 0;
 		Athletic = 0;
 		Endurace = 0;
-		Wisdome = 0;
+		Wisdom = 0;
 		Doge = 0;
 		Attitude = 0;
 		Luck = 0;
 		AttackDamagePercentage = 0;
-		Unkown_2 = 0;
+		Unkown = 0;
 	};
 
 	// Use this at the Start of the Game
@@ -81,12 +81,12 @@ struct FPlayerStats
 		LifeSteal = 0;
 		Athletic = 0;
 		Endurace = 0;
-		Wisdome = 0;
+		Wisdom = 0;
 		Doge = 0;
 		Attitude = 100;
 		Luck = 0;
 		AttackDamagePercentage = 0;
-		Unkown_2 = 99;
+		Unkown = 99;
 	};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -111,7 +111,7 @@ struct FPlayerStats
 	int32 Endurace;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Wisdome;
+	int32 Wisdom;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Doge;
@@ -126,7 +126,7 @@ struct FPlayerStats
 	int32 AttackDamagePercentage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Unkown_2;
+	int32 Unkown;
 
 	// Armor
 	// StunResistance
@@ -140,5 +140,4 @@ enum class EUIItemType : uint8
 	EUIIT_BuyableItem		UMETA(Displayname = "BuyableItem"),
 	EUIIT_BuyableWeapon		UMETA(Displayname = "BuyableWeapon"),
 	EUIIT_Default			UMETA(Displayname = "None")
-
 };

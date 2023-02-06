@@ -53,8 +53,6 @@ struct FItemRarityTable : public FTableRowBase
 
 };
 
-
-
 UENUM(BlueprintType)
 enum class EItemState : uint8
 {
@@ -113,6 +111,8 @@ protected:
 	// Get interpLocation based on the item type
 	FVector GetInterpLocation();
 
+	void HidePickUpWidget();
+
 	// Plays PickupSound and starts TimerHandle
 	void PlayPickUpSound();
 
@@ -153,35 +153,35 @@ protected:
 	/// ONLY For Testing purpose
 	/// </summary>
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		class USceneComponent* NewRootComponent;
+	class USceneComponent* NewRootComponent;
 
 	// Line trace collides with box to show HUD widgets
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		class UBoxComponent* CollisionBox;
+	class UBoxComponent* CollisionBox;
 
 	// SkleetalMesh for the Item
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		class USkeletalMeshComponent* ItemSkeletalMesh;
+	class USkeletalMeshComponent* ItemSkeletalMesh;
 	
 	// PopUp Widget for when the player looks at the item
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		class UWidgetComponent* PickupWidget;
+	class UWidgetComponent* PickupWidget;
 
 	// Enable item tracing when overlapped
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		class USphereComponent* AreaSphere;
+	class USphereComponent* AreaSphere;
 
 	// ItemRarity determines number of starts in Pickup Widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RarityDataTable", meta = (AllowPrivateAccess))
-		EItemRarity ItemRarity;
+	EItemRarity ItemRarity;
 
 	// State of the Item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		EItemState ItemState;
+	EItemState ItemState;
 
 	// Enum for the Type of Item
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess))
-		EItemType ItemType;
+	EItemType ItemType;
 
 	// Item Rarity DataTable
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "RarityDataTable", meta = (AllowPrivateAccess))
@@ -189,68 +189,66 @@ protected:
 
 	// Color in the glow material
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "RarityDataTable", meta = (AllowPrivateAccess))
-		FLinearColor GlowColor;
+	FLinearColor GlowColor;
 
 	// Light Color in the Pickup Widget
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "RarityDataTable", meta = (AllowPrivateAccess))
-		FLinearColor LightColor;
+	FLinearColor LightColor;
 
 	// Dark Color in the HUD Inventory
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "RarityDataTable", meta = (AllowPrivateAccess))
-		FLinearColor DarkColor;
+	FLinearColor DarkColor;
 
 	// Number of stars in the pickupWidget
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "RarityDataTable", meta = (AllowPrivateAccess))
-		int32 NumberOfStars;
+	int32 NumberOfStars;
 
 	// Background icon the for HUD Inventory
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "RarityDataTable", meta = (AllowPrivateAccess))
-		UTexture2D* IconBackground;
+	UTexture2D* IconBackground;
 
 	// Value to set the CustomDepthStencil within in OnConstruciton fuction
 	int32 CustomDepthStencil;
 
-private:
-	
-	
+private:	
 	// Name which appear on the item Pickup
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		FString ItemName;
+	FString ItemName;
 
 	// Amount of Item ( Ammo, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		int32 ItemCount;
+	int32 ItemCount;
 
 	// Array that determies wich stars are visible on the Widget
 	UPROPERTY(VisibleDefaultsOnly, AdvancedDisplay, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		TArray<bool> ActiveStars;
+	TArray<bool> ActiveStars;
 
 	// Curve asset to use for the item's Z location when interping
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		class UCurveFloat* ItemZCurve;
+	class UCurveFloat* ItemZCurve;
 
 	// Curve used to sclae the item when interpolating
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		UCurveFloat* ItemScaleCurve;
+	UCurveFloat* ItemScaleCurve;
 
 	// Starting Location when interping begins
 	UPROPERTY(VisibleDefaultsOnly, AdvancedDisplay, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		FVector ItemInterpStartLocation;
+	FVector ItemInterpStartLocation;
 
 	// Target interp location in front of the camera
 	UPROPERTY(VisibleDefaultsOnly, AdvancedDisplay, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		FVector CameraTargetLocation;
+	FVector CameraTargetLocation;
 
 	// true when interping
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		bool bInterping;
+	bool bInterping;
 
 	// Plays when we start interping
 	FTimerHandle ItemInterpolationTimer;
 
 	// Duration of the curve and Timer Default Value is 0.7 Sec. Siehe Constructer
 	UPROPERTY(VisibleDefaultsOnly, AdvancedDisplay, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
-		float ZCurveTime;
+	float ZCurveTime;
 
 	// Pointer to the Character
 	UPROPERTY(BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess))
@@ -312,22 +310,17 @@ private:
 
 	// Time for the PulseTimer
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material", meta = (AllowPrivateAccess))
-		float PulseCurveTime;
+	float PulseCurveTime;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Material", meta = (AllowPrivateAccess))
-		float GlowAmount;
+	float GlowAmount;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Material", meta = (AllowPrivateAccess))
-		float FresnelExponent;
+	float FresnelExponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Material", meta = (AllowPrivateAccess))
-		float FresnelReflectFraction;
-
-	/*// BackgroundImage for this Item in the Inventory UI
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess))
-		UTexture2D* IconBackground;
-	*/
-
+	float FresnelReflectFraction;
+	
 	// Icon for this Item in the Inventory UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess))
 	UTexture2D* IconItem;
@@ -340,7 +333,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess))
 	int32 InventorySlot;
 	
-
 public: // Getter and Setter
 
 	UWidgetComponent* GetPickUpWidget(); //const;

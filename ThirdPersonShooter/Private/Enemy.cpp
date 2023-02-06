@@ -30,7 +30,7 @@ AEnemy::AEnemy()
 	// Functionality
 	bActivateAgressionSphereFunctionality = false;
 	bActivatePatrolPointsFunctionality = false;
-		
+	
 	PointerToSelf = this;
 	MaxHealth = 100.f;
 	BaseDamage = 10.f;
@@ -95,11 +95,12 @@ AEnemy::AEnemy()
 		FName(TEXT("PrimaryAttack_RAF"))
 	};
 	// Set Montage Sections for DeathMontage
-	DeathMontageSections = { FName(TEXT("Death_A")) ,
-							FName(TEXT("Death_B")) };
+	DeathMontageSections = {
+		FName(TEXT("Death_A")),
+		FName(TEXT("Death_B"))
+	};
 
-
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this character to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Create and setup Agression Sphere
@@ -117,17 +118,17 @@ AEnemy::AEnemy()
 	LeftWeaponCollisionBox = CreateDefaultSubobject<UBoxComponent>(FName(TEXT("LWeaponCollision")));
 	LeftWeaponCollisionBox->SetupAttachment(GetMesh(), FName(TEXT("LWeaponSocket")));
 
+	// Hitzones
 	InitializeHitZoneImpactSound();
-	InitializeHitZoneImpactEffects();
-	
-	
+	InitializeHitZoneImpactEffects();	
 }
 
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-		
+	
+	// Block Camera Movement into Enemy
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	
 	// Set AiController and runs BehaviorTree
@@ -137,10 +138,7 @@ void AEnemy::BeginPlay()
 	StoreRefToPlayer();
 
 	// Take care of Health
-	if (CurrentHealth > MaxHealth)
-	{
-		MaxHealth = CurrentHealth;
-	}
+	EnsureMaxHealthisCurrentHealth();	
 	
 	// Set Movement Speed
 	GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSpeed;
@@ -154,6 +152,7 @@ void AEnemy::BeginPlay()
 	// Set the Attack Target based on bActivateAgressionSphereFunctionality
 	HandleAttackTarget();
 	
+	// Bind Methods
 	MeleeRangeSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::MeleeRangeSpherBeginOverlap);
 	MeleeRangeSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::MeleeRangeSphereEndOverlap);
 	LeftWeaponCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::LeftWeaponCollisionBoxBeginOverlap);
@@ -166,13 +165,8 @@ void AEnemy::BeginPlay()
 	RegisterCharacterIsDeadDelegate();
 
 	// Add Tag to the Enemy
-	Tags.Add(FName(TEXT("Enemy")));	
-
-	/*if (ActorHasTag(FName(TEXT("Enemy"))))
-	{
-		UE_LOG(MyLog, Warning, TEXT("%s: Has Tag Enemy"), *GetActorLabel());
-	}*/
-
+	SetEnemyTag();
+	
 	// MOVE
 	InitializeDefaultFHitZoneValues();
 	UpdateFHitZoneValues();
@@ -183,11 +177,11 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Take care of Animating HitValues
 	UpdateHitNumbersScreenPosition();
 
 	// Makes the Character turn to the Target, If Target is Valid
 	TurnToTarget();
-
 }
 
 void AEnemy::SetupEnemyBehaviorTree()
@@ -200,7 +194,6 @@ void AEnemy::SetupEnemyBehaviorTree()
 		EnemyAIController->RunBehaviorTree(BehaviorTree);
 		EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName(TEXT("bDead")), false);
 	}
-
 }
 
 void AEnemy::HandleAttackTarget()
@@ -296,8 +289,7 @@ void AEnemy::AgressionSphereOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		EnemyAIController->GetBlackboardComponent()->SetValueAsObject(FName(TEXT("TargetActor")), OtherActor);
 		bAllowToTurn = true;
 
-	}
-	
+	}	
 }
 
 void AEnemy::AgressionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -325,9 +317,6 @@ void AEnemy::AgressionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent,
 			AttackTarget = nullptr;
 		}
 	}
-	
-	
-
 }
 
 void AEnemy::MeleeRangeSpherBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -367,8 +356,7 @@ void AEnemy::MeleeRangeSphereEndOverlap(UPrimitiveComponent* OverlappedComponent
 }
 
 void AEnemy::DealDamageToPlayerCharacter(AShooterCharacter* PlayerCharacter)
-{
-	
+{	
 	if (PlayerCharacter && !bDealtDamageInThisAnimation)
 	{
 		float Damage = 0.f;
@@ -380,7 +368,6 @@ void AEnemy::DealDamageToPlayerCharacter(AShooterCharacter* PlayerCharacter)
 		//UE_LOG(CombatLog, Warning, TEXT("DealDamage to Player"));
 		UGameplayStatics::ApplyDamage(PlayerCharacter, Damage, EnemyAIController, this, UDamageType::StaticClass());
 		
-
 		// Check for stunning the Player Character
 		if (PlayerCharacter->RollForStunResistance(GetStunChance()))
 		{
@@ -403,7 +390,7 @@ void AEnemy::RightWeaponCollisionBoxBeginOverlap(UPrimitiveComponent* Overlapped
 	if (OtherActor)
 	{	
 		//TO DO: Implement Melee Interface?
-		// Cast Propably to CPU intensif
+		// Cast Propably to CPU intensif but okey for now
 		AShooterCharacter* Player = Cast<AShooterCharacter>(OtherActor);
 		AExplosiv* Explosiv = Cast<AExplosiv>(OtherActor);
 
@@ -421,7 +408,6 @@ void AEnemy::RightWeaponCollisionBoxBeginOverlap(UPrimitiveComponent* Overlapped
 				UGameplayStatics::PlaySound2D(GetWorld(), Explosiv->GetMeleeImpactSound());
 			}
 		}
-
 	}
 }
 
@@ -452,23 +438,20 @@ void AEnemy::LeftWeaponCollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedC
 
 
 void AEnemy::SpawnBloodEmitter(UParticleSystem* BloodParticle, UPrimitiveComponent* OtherComp, double EmitterScale)
-{
-		
+{		
 	// Create Blood Effect
 	if (BloodParticle && this->GetWorld())
 	{
 		FTransform ScaledTransform = OtherComp->GetComponentTransform().GetScaled(EmitterScale);
 		UGameplayStatics::SpawnEmitterAttached(BloodParticle, OtherComp, FName(NAME_None), FVector(ForceInit), FRotator(0.f), FVector(EmitterScale));
-		
 	}
 }
 
  void AEnemy::ShowHealthAmount_Implementation()
-{
-	
+{	
 	GetWorld()->GetTimerManager().ClearTimer(ShowHealthAmountTimer);
 	GetWorld()->GetTimerManager().SetTimer(ShowHealthAmountTimer, this, &AEnemy::HideHealthAmount, ShowHealthAmountForTimeX);
-	
+		
 }
 
 void AEnemy::ShowHealthBar()
@@ -491,7 +474,9 @@ bool AEnemy::PlayAttackMontage(FName MontageSectionName, float PlayRate, bool bA
 {
 	if (PlayRate <= 0.f || MontageSectionName == "" || MontageSectionName == "NONE")
 	{
-		//UE_LOG(MyLog, Error, TEXT("PlayAttackMontage on %s, has a Playrate of %f, which is should be allowed! Or MontageSectionName is invalid! "), *GetActorLabel(), PlayRate);
+	#if EDITOR 
+		UE_LOG(MyLog, Error, TEXT("PlayAttackMontage on %s, has a Playrate of %f, which is should be allowed! Or MontageSectionName is invalid! "), *GetActorLabel(), PlayRate);
+	#endif
 		return false;
 	}
 
@@ -505,17 +490,14 @@ bool AEnemy::PlayAttackMontage(FName MontageSectionName, float PlayRate, bool bA
 		// Each EnemyType may have different Values
 		AttackMontage->BlendIn.SetBlendTime(AttackMontageBlendInTime);
 		AttackMontage->BlendOut.SetBlendTime(AttackMontageBlendOutTime);
-			
-		
+					
 		AnimInstance->Montage_Play(AttackMontage, PlayRate);
 		AnimInstance->Montage_JumpToSection(MontageSectionName, AttackMontage);
 			
-
 		// Get SectionLength
 		int32 SectionIndex = AnimInstance->GetCurrentActiveMontage()->GetSectionIndex(MontageSectionName);
 		SectionLength = AnimInstance->GetCurrentActiveMontage()->GetSectionLength(SectionIndex);
 		
-
 		if (bAllowAttackTurning)
 		{
 			FTimerHandle AttackAnimationHandle;
@@ -526,7 +508,6 @@ bool AEnemy::PlayAttackMontage(FName MontageSectionName, float PlayRate, bool bA
 		// Set Cooldown and ActivateTimer for Cooldown
 		StartAttackCooldownTimer(SectionLength / PlayRate);
 		
-
 		// Set bFinishedAttackAnimation to true, due Animation is starting
 		SetAttackAnimationIsPlaying(true);
 
@@ -542,7 +523,6 @@ void AEnemy::StartAttackCooldownTimer(float Length)
 {
 	GetWorldTimerManager().SetTimer(AttackCooldownHandle, this, &AEnemy::AttackCooldownCallback, Length + AttackCooldownTime + CalculateAttackCooldownDeviation());
 	
-
 	SetIsOnAttackCooldownState(true);
 	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName(TEXT("bIsOnAttackCooldown")), true);
 }
@@ -600,7 +580,7 @@ void AEnemy::TurnToTarget()
 			FRotator NewRotation = VectorToTarget.Rotation();
 			//	GEngine->AddOnScreenDebugMessage(3, -1.f, FColor::Blue, FString::Printf(TEXT("Target to Rotation: %s"), *Test.ToString()));
 
-			// Allowing  slighty to look up
+			// Allowing slighty to look up
 			if (FMath::Abs(NewRotation.Pitch) >= 25.f)
 			{
 				NewRotation.Pitch = 25.f;
@@ -625,7 +605,6 @@ FName AEnemy::GetRandomAttackSectionName()
 
 void AEnemy::PlayHitMontage(FName MontageSectionName, float PlayRate)
 {
-
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
 	if (HitMontage && AnimInstance)
@@ -643,10 +622,8 @@ void AEnemy::PlayHitMontage(FName MontageSectionName, float PlayRate)
 			AnimInstance->Montage_JumpToSection(MontageSectionName, HitMontage);
 			// Delaying next play of the HitMontage
 			GetWorldTimerManager().SetTimer(HitMontageReactTimer, HalfMontageSectionTime, false);
-		}
-		
+		}		
 	}
-
 }
 
 void AEnemy::StoreHitNumber(UUserWidget* HitNumber, FVector Location)
@@ -689,13 +666,10 @@ void AEnemy::UpdateHitNumbersScreenPosition()
 	}
 }
 
-
-
 // Called to bind functionality to input
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AEnemy::PlayHitSoundForHitZone(FHitZone* HitZone)
@@ -792,14 +766,12 @@ void AEnemy::CheckSoundForHitZone(uint32 Index)
 }
 
 void AEnemy::BulletHit_Implementation(FHitResult HitResult, FHitZone& HitZone)
-{
-	
+{	
 	float Damage = 0.f;
 	
 	// Need to be called before CalculateDamage
 	HitZone.PhysicalMaterial = HitResult.PhysMaterial.Get();
 	Damage = StatsCalculator::CalculateDamage(HitZone);
-
 
 	if (HitZone.InstigatorRef )
 	{ 
@@ -815,7 +787,6 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult, FHitZone& HitZone)
 	// Play Effect
 	this->PlayEffectForHitZone(HitResult, &HitZone);
 
-
 	// Check if impact stuns the enemy
 	// TODO: Implement a Stun Value for each Weapon
 	// For now just use a fixed Value
@@ -827,7 +798,7 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult, FHitZone& HitZone)
 	//  HealthAmount
 	ShowHealthAmount();
 
-
+	// Use this for Debugging the hit Material.
 	// UE_LOG(CombatLog, Warning, TEXT("PM hit: %s "), *(HitResult.PhysMaterial.Get()->GetName()));
 	
 }
@@ -838,7 +809,6 @@ void AEnemy::ExplosionHit_Implementation(float Damage, float ExplosivStunChance)
 	{
 		CurrentHealth = 0.f;
 		EnemyDie();
-
 	}
 	else
 	{
@@ -855,8 +825,9 @@ void AEnemy::ExplosionHit_Implementation(float Damage, float ExplosivStunChance)
 		//  HealthAmount
 		ShowHealthAmount();
 	}
-
-	//UE_LOG(CombatLog, Warning, TEXT("%s Got Hit for %f by ExplosionDamage"), *PointerToSelf->GetActorLabel(), Damage);
+#if EDITOR 
+	UE_LOG(CombatLog, Warning, TEXT("%s Got Hit for %f by ExplosionDamage"), *PointerToSelf->GetActorLabel(), Damage);
+#endif
 }
 
 
@@ -864,10 +835,10 @@ bool AEnemy::RollForStunResistance( float InStunChance )
 {
 	// Allow Check only if enemy is not Stunned
 	if (bStunned == false)
-	{		
-
-		//UE_LOG(CombatLog, Warning, TEXT("%s: InStunChance: %f, CalculatetStunChance would be: %f"), *this->GetActorLabel(), InStunChance, InStunChance - StunResistance);
-
+	{	
+#if EDITOR 
+		UE_LOG(CombatLog, Warning, TEXT("%s: InStunChance: %f, CalculatetStunChance would be: %f"), *this->GetActorLabel(), InStunChance, InStunChance - StunResistance);
+#endif
 		InStunChance -= StunResistance;
 		
 		// Check Limits
@@ -885,7 +856,7 @@ bool AEnemy::RollForStunResistance( float InStunChance )
 		if (InStunChance >= RandomRoll)
 		{
 			//UE_LOG(CombatLog, Warning, TEXT("Stunned sucess :Rolled: %f, InStunChance: %f"), RandomRoll, InStunChance);
-			// Stun sucessfull
+			// Stun successful
 			return true;
 		}
 		else 
@@ -927,8 +898,7 @@ void AEnemy::ForceAggressionCallback()
 
 	// Check if player is inside the Aggression sphere, if not unset TargetActor
 	if (!IsPlayerInsideAggressionSphere(false))
-	{
-		
+	{		
 		if (EnemyAIController)
 		{
 			EnemyAIController->GetBlackboardComponent()->ClearValue(FName(TEXT("TargetActor")));
@@ -937,24 +907,18 @@ void AEnemy::ForceAggressionCallback()
 	}
 }
 
-void AEnemy::ForceAgressionOnPlayer(AActor* Victim)
+void AEnemy::ForceAgressionOnPlayer()
 {
-	//TODO keep a global reference to player
-	AShooterCharacter* PlayerCharacter = Cast<AShooterCharacter>(Victim);
-
-	if (PlayerCharacter)
-	{
-		
+	if (MainCharacter)
+	{		
 		if (EnemyAIController)
 		{
-			EnemyAIController->GetBlackboardComponent()->SetValueAsObject(FName(TEXT("TargetActor")), PlayerCharacter);
-			AttackTarget = PlayerCharacter;
+			EnemyAIController->GetBlackboardComponent()->SetValueAsObject(FName(TEXT("TargetActor")), MainCharacter);
+			AttackTarget = MainCharacter;
 		}
-
 		GetWorldTimerManager().SetTimer(ForceAggressionTimerHandle, this, &AEnemy::ForceAggressionCallback, FollowTimeAfterShoot, false);
 		bForceAggressionOnPlayer = true;
 	}
-
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventIstigator, AActor* DamageCauser)
@@ -962,18 +926,15 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	// Player shot the Enemy outside his aggression Sphere, the Enemy gets aggressiv
 	if (AttackTarget == nullptr)
 	{
-		ForceAgressionOnPlayer(DamageCauser);
-
+		ForceAgressionOnPlayer();
 	}
-
-	// New Version
+		
 	CurrentHealth = CurrentHealth - DamageAmount;
 
 	if (CurrentHealth <= 0.f)
 	{
 		CurrentHealth = 0.f;
-		EnemyDie();
-					
+		EnemyDie();					
 	}
 	else
 	{
@@ -1052,28 +1013,21 @@ void AEnemy::EnemyDie()
 	// Deactivate Collision
 	AgressionSphere2->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	MeleeRangeSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		
-
 	if (EnemyAIController)
 	{
 		EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName(TEXT("bDead")), true);
 		bDead = true;
 	}
 
-
 	// Enemy can no longer Move
 	GetController()->StopMovement();
-
-
-
 }
 
 void AEnemy::HandleDestroy()
 {
-	Destroy();
-	
+	Destroy();	
 }
 
 void AEnemy::PlayDeathAnimation(float Playrate)
@@ -1085,18 +1039,7 @@ void AEnemy::PlayDeathAnimation(float Playrate)
 		int64 randomNumber = FMath::RandRange(0, DeathMontageSections.Num()-1);
 		
 		AnimInstance->Montage_JumpToSection(DeathMontageSections[randomNumber], DeathMontage);
-		AnimInstance->Montage_Play(DeathMontage, Playrate);
-		
-		// DEPRECATED
-		/*
-		
-		// Call Destory
-		float DeathSectionLength = DeathMontage->GetSectionLength(DeathMontage->GetSectionIndex(DeathMontageSections[randomNumber]));
-		FTimerHandle DeathEndAnimationTimerHandle;
-
-		// Pause Animation after finishing Dying Animation
-		GetWorldTimerManager().SetTimer(DeathEndAnimationTimerHandle, this, &AEnemy::PauseAnimationBeforeDeath, DeathSectionLength, false);
-		*/
+		AnimInstance->Montage_Play(DeathMontage, Playrate);				
 	}
 }
 
@@ -1112,7 +1055,6 @@ void AEnemy::PauseAnimationBeforeDeath()
 
 	FTimerHandle DeathHandleTimerHandle;
 	GetWorldTimerManager().SetTimer(DeathHandleTimerHandle, this, &AEnemy::HandleDestroy, DestroyDelayAfterDeath, false);
-
 }
 
 void AEnemy::SetMainCharacterIsDead_DepedingOnCharacterState()
@@ -1125,25 +1067,21 @@ void AEnemy::SetMainCharacterIsDead_DepedingOnCharacterState()
 		{	
 			EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName(TEXT("bMainCharacterIsDead")), CharacterIsDead);
 		}
-
 	}
 }
 
 void AEnemy::MainCharacterIsDead(bool State)
 {
-	//FString Name = GetActorLabel();
-	
-	//UE_LOG(DelegateLog, Log, TEXT("MainCharacterIsDead has been called! on %s"), *Name );
+#if EDITOR 
+	FString Name = GetActorLabel();	
+	UE_LOG(DelegateLog, Log, TEXT("MainCharacterIsDead has been called! on %s"), *Name );
+#endif
 
 	if (EnemyAIController)
 	{
 		bMainCharacterIsDead = true;
 		EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName(TEXT("bMainCharacterIsDead")), true);
-	}
-
-
-
-	
+	}	
 }
 
 void AEnemy::RegisterCharacterIsDeadDelegate()
@@ -1161,8 +1099,7 @@ void AEnemy::StoreRefToPlayer()
 }
 
 void AEnemy::UpdateFHitZoneValues()
-{
-	
+{	
 	CriticalHitZone.DamageMultiplier = CriticalHitZoneOverride.DamageMultiplier;
 	CriticalHitZone.EnemyArmor = CriticalHitZoneOverride.EnemyArmor;
 	
@@ -1186,11 +1123,7 @@ void AEnemy::UpdateFHitZoneValues()
 	ZoneDamage.Add(EPhysicalSurface::SurfaceType12, &MinorHitZone);
 
 	// Create Pointer to ZoneDamage
-	ZoneDamagePtr = &ZoneDamage;
-	
-	
-	
-	
+	ZoneDamagePtr = &ZoneDamage;	
 }
 
 void AEnemy::InitializeHitZoneImpactSound()
@@ -1217,15 +1150,13 @@ void AEnemy::InitializeDefaultFHitZoneValues()
 	CriticalHitZone.DamageMultiplier = 1.f;
 	CriticalHitZone.EnemyArmor = 0.f;
 	if (HitZoneMaterials[0])
-	CriticalHitZone.PhysicalMaterial = HitZoneMaterials[0];
-	
+	CriticalHitZone.PhysicalMaterial = HitZoneMaterials[0];	
 		
 	// High
 	HighHitZone.DamageMultiplier = 2.f;
 	HighHitZone.EnemyArmor = 0.f;
 	if (HitZoneMaterials[1])
-	HighHitZone.PhysicalMaterial = HitZoneMaterials[1];
-	
+	HighHitZone.PhysicalMaterial = HitZoneMaterials[1];	
 
 	// Default
 	DefaultHitZone.DamageMultiplier = 1.f;
@@ -1233,21 +1164,17 @@ void AEnemy::InitializeDefaultFHitZoneValues()
 	if (HitZoneMaterials[2] != nullptr)
 	DefaultHitZone.PhysicalMaterial = HitZoneMaterials[2];
 
-
 	// Low
 	LowHitZone.DamageMultiplier = 0.5f;
 	LowHitZone.EnemyArmor = 0.f;
 	if (HitZoneMaterials[3] != nullptr)
 	LowHitZone.PhysicalMaterial = HitZoneMaterials[3];
 
-
 	// Minor
 	MinorHitZone.DamageMultiplier = 0.1f;
 	MinorHitZone.EnemyArmor = 0.f;
 	if (HitZoneMaterials[4])
-	MinorHitZone.PhysicalMaterial = HitZoneMaterials[4];
-	
-	
+	MinorHitZone.PhysicalMaterial = HitZoneMaterials[4];	
 }
 
 void AEnemy::SetPlayerCharacterAsTarget(AShooterCharacter* Target)
@@ -1259,6 +1186,7 @@ void AEnemy::SetPlayerCharacterAsTarget(AShooterCharacter* Target)
 
 	}
 }
+
 void AEnemy::SetupWeaponCollisionBoxes()
 {
 	LeftWeaponCollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -1270,7 +1198,6 @@ void AEnemy::SetupWeaponCollisionBoxes()
 	RightWeaponCollisionBox->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	RightWeaponCollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	RightWeaponCollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
-
 }
 
 void AEnemy::SetUpPatrolPointsFunctionanlity()
@@ -1282,18 +1209,13 @@ void AEnemy::SetUpPatrolPointsFunctionanlity()
 			TranformLocalVectorToWorldVector(PatrolPoint);
 			TranformLocalVectorToWorldVector(PatrolPoint2);
 			UpdatePatrolPointsLocations();
-
 			EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName(TEXT("bPatrolFunctionalityActivated")), true);
 		}
 		else
 		{
 			EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName(TEXT("bPatrolFunctionalityActivated")), false);
-		}
-	
-		
-	}
-
-	
+		}		
+	}	
 }
 
 int32 AEnemy::SendExperienceToPlayer()
@@ -1326,6 +1248,25 @@ void AEnemy::SpawnCashItems()
 		{
 			SpawnedBaseItem->SpawingItems(GetActorTransform(), SpawnedBaseItem);
 		}
-
 	}
+}
+
+void AEnemy::EnsureMaxHealthisCurrentHealth()
+{
+	if (CurrentHealth > MaxHealth)
+	{
+		MaxHealth = CurrentHealth;
+	}
+}
+
+void AEnemy::SetEnemyTag()
+{
+	Tags.Add(FName(TEXT("Enemy")));
+
+#if EDITOR 
+	if (ActorHasTag(FName(TEXT("Enemy"))))
+	{
+		UE_LOG(MyLog, Warning, TEXT("%s: is missing Tag \'Enemy\'"), *GetActorLabel());
+	}
+#endif
 }

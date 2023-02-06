@@ -16,18 +16,14 @@
 #include "Kismet/GameplayStatics.h"
 
 ADroppableItem::ADroppableItem()
-{
-	
+{	
 	MeshRandomSpawnDeviationMin = 1.f;
 	MeshRandomSpawnDeviationMax = 1.f;
 	MeshMaxScaleSize = 1.f;
-
-	//ItemDropChance = 100.f;
-	//HealthDropChance = 100.f;
-	//CashDropChance = 100.f;
+		
 	AbsoluteSpawnPercentageOfAllItems = 0.f;
+	ForceSize = 10'000.f;
 	
-
 	ItemRarity = EItemRarity::EIR_Default;
 	ItemState = EItemState::EIS_OnGround;
 	ItemType = EItemType::EIT_Droppable;
@@ -39,7 +35,8 @@ ADroppableItem::ADroppableItem()
 	StaticMeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 	StaticMeshComponent->BodyInstance.bOverrideMass = true;
 	StaticMeshComponent->BodyInstance.SetMassOverride(1.f);
-	// Do not use in Constructor, uses call to GEngine which is not valid durining construction
+	/// NOTE:
+	// Do not use in Constructor, uses call to GEngine,which is not valid durning construction
 	//StaticMeshComponent->SetMassOverrideInKg(NAME_None, 1.f);
 	SetRootComponent(StaticMeshComponent);
 	
@@ -68,7 +65,6 @@ ADroppableItem::ADroppableItem()
 	PickupWidget->SetComponentTickEnabled(false);
 	PickupWidget->SetVisibility(false, false);
 	PickupWidget->SetupAttachment(StaticMeshComponent);
-
 }
 
 
@@ -77,11 +73,12 @@ void ADroppableItem::BeginPlay()
 	Super::BeginPlay();
 
 	MakeItemUnPickableforShortTIme();
+
 	StaticMeshComponent->OnComponentHit.AddDynamic(this, &ADroppableItem::OnComponentHit);
+	// Remove and add New Methode
 	AreaSphere->OnComponentBeginOverlap.Clear();
 	AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &ADroppableItem::OnSphereOverlap);
 		
-
 	// Set Static Ref to PlayerCharacter
 	SetMainCharacterRef();
 	// ReScale Object
@@ -95,14 +92,12 @@ void ADroppableItem::BeginPlay()
 	StaticMeshComponent->SetRenderCustomDepth(true);
 
 	// Add Tag to the Enemy
-	Tags.Add(FName(TEXT("Loot")));
-	
+	Tags.Add(FName(TEXT("Loot")));	
 }
 
 void ADroppableItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ADroppableItem::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -128,7 +123,9 @@ void ADroppableItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, A
 		}
 		else
 		{
-		//	UE_LOG(ItemLog, Warning, TEXT("%s: DoItemRoutine failed!"), *this->GetActorLabel());
+		#if EDITOR 
+			UE_LOG(ItemLog, Warning, TEXT("%s: DoItemRoutine failed!"), *this->GetActorLabel());
+		#endif
 		}
 	}
 	else
@@ -173,47 +170,48 @@ void ADroppableItem::MakeItemUnPickableforShortTIme()
 	float Time = 0.25f;
 
 	GetWorldTimerManager().SetTimer(SphereCollision, this, &ADroppableItem::ActivateAreaSphereCollision, Time);
-
 }
 
 void ADroppableItem::ActivateAreaSphereCollision()
 {
 	if(AreaSphere)
-	AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	AreaSphere->SetGenerateOverlapEvents(true);
+	{
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		AreaSphere->SetGenerateOverlapEvents(true);
+	}
 }
 
 void ADroppableItem::InitializeDynamicSpawnParameter(ADroppableItem* Item)
 {	
-	Item->GetStaticMeshComponent()->SetSimulatePhysics(true);
-	Item->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	Item->GetStaticMeshComponent()->SetNotifyRigidBodyCollision(true);
-	Item->GetStaticMeshComponent()->SetEnableGravity(true);
-	Item->GetStaticMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	Item->GetStaticMeshComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+	if (Item)
+	{
+		Item->GetStaticMeshComponent()->SetSimulatePhysics(true);
+		Item->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Item->GetStaticMeshComponent()->SetNotifyRigidBodyCollision(true);
+		Item->GetStaticMeshComponent()->SetEnableGravity(true);
+		Item->GetStaticMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		Item->GetStaticMeshComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 
-	
-	// Add Force
-	Item->GetStaticMeshComponent()->AddForce(CalculateRandomThrowAngle() * 20'000.f);
-		
+		// Add Force
+		Item->GetStaticMeshComponent()->AddForce(CalculateRandomThrowAngle() * ForceSize);
+	}		
 }
 
 FVector ADroppableItem::CalculateRandomThrowAngle()
 {
 	float Degree = FMath::FRandRange(0.f, 2 * 3.1415f);
 
+	// Create Vector with 45° away from origin
 	FVector AddForceVector = (GetActorUpVector() + GetActorRightVector());
 	AddForceVector.X = AddForceVector.X * FMath::Cos(Degree) - AddForceVector.Y * FMath::Sin(Degree);
 	AddForceVector.Y = AddForceVector.X * FMath::Sin(Degree) + AddForceVector.Y * FMath::Cos(Degree);
 	AddForceVector.Z = AddForceVector.Z;
-
-	//AddForceVector = AddForceVector * 20'000.f;
+		
 	return AddForceVector;
 }
 
  void ADroppableItem::SpawingItems(FTransform Transform, AActor* SpawnParent)
-{
-	
+{	
 	 FActorSpawnParameters Parameters;
 	 Parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	 ADroppableItem* SpawnedItemReferenz = nullptr;	 	 
@@ -229,6 +227,7 @@ FVector ADroppableItem::CalculateRandomThrowAngle()
 	 bool bStop = false; 
 	 auto CurrentMaxBorder = ItemSet[SetElementId].Key;
 	 
+	 /// Random Selection Mechanics
 	 // Go Through each Pair in TSet and compore its SpawnChance to the rolled Chance
 	 // if the rolled Value is lower than the Border then this items get selected to Spawn
 	 // if rolled Value is higer the CurrentBorder increased by the percentage of the last item
@@ -249,24 +248,9 @@ FVector ADroppableItem::CalculateRandomThrowAngle()
 		 }
 	 }
 
-	 //for (int32 i = 0; i < ItemSet.Num() && !bStop; i++)
-	 //{		 		 
-		//	 if (Roll <= (CurrentMaxBorder))
-		//	 {
-		//		 SlotResult = i;
-		//		 bStop = true;
-		//	 }
-		//	 else
-		//	 {
-		//		// SlotResult++;
-		//		 SetElementId = FSetElementId::FromInteger(i+1);
-		//		 //SetElementId.FromInteger(SlotResult);
-		//		 CurrentMaxBorder += ItemSet[SetElementId].Key;
-		//	 }
-	 //}
-
-	 // Return the Pointer Referenz to the Object at the desired Index
-	  SetElementId.FromInteger(SlotResult);
+	 // Return the Pointer Referenz form the for Loop to get the correct Index.
+	 //	And set Result to the Value of the Pointer at the given Index.
+	 SetElementId.FromInteger(SlotResult);
 	 auto Result = ItemSet[SetElementId].Value;
 	
 	 if (Result.IsValid())
@@ -296,10 +280,10 @@ FVector ADroppableItem::CalculateRandomThrowAngle()
 
  void ADroppableItem::CheckingReferenzes()
  {
+	 // Causes a Crash in Packaged Project or Haltpoint in VS if the condition aren't met.
 	  check(HealthDrop.Get());
 	  check(CashDrop.Get());
 	  check(AmmoDrop.Get());
-
  }
 
  void ADroppableItem::InitializeTSet()

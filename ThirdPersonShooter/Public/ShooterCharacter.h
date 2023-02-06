@@ -127,6 +127,11 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	UPhysicalMaterial* GetPhysicalMaterialUnderFootsteps(FName BoneName, bool ShowDebug);
+
+	void CreateInterpolationComponents();
+
+	// Set Max and Min Pitch as well Camera FOV
+	void SetCameraProperties();
 	
 	// Gets Called when Fire Button is Pressed
 	void FireButtonPressed();
@@ -147,10 +152,6 @@ protected:
 	// Use this for calculating WeaponFireEndTrace, CrosshairSpreadMultiplier is taken into account,
 	bool TraceUnderCrosshairForWeaponFire(FHitResult& OutHitResult, FVector& OutHitLocation);
 
-	// Trace for items if OverlappedItemCount is greater than 0
-	/*
-	void TraceForItems();
-	*/
 	// Spawn Default Weapon 
 	class AWeapon* SpawnDefaultWeapon();
 
@@ -351,8 +352,7 @@ private:
 
 	// Controller Look Up Sensivity while not Aiming
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = CameraController, meta = (AllowPrivateAccess = "true"))
-	float ControllerHipLookUpRate;
-		
+	float ControllerHipLookUpRate;		
 
 	// Mouse Turn Rate while Aiming
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = CameraMouse, meta = (AllowPrivateAccess = "true", ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
@@ -574,6 +574,17 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	bool bCrouching;
 
+	// Amount of more Experience needed for the Next Level, Default 10 Points more needed
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	float XpIncreasementForNextLevelUp;
+
+	// Xp nedded for the first Level, Default Value 100, increases each Level UP
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	float XPforNextLevelUp;
+
+	// Stores the Value of the needed Xp for the first Level, 
+	float XPForNextLevelUpBase;
+
 	// Regular Movement Speed
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float BaseMovementSpeed;
@@ -581,6 +592,10 @@ private:
 	// Crouch Movement Speed
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float CrouchMovementSpeed;
+
+	// Save the Base Crouch and Movement Speed of the Character, used for Stats Calculation
+	float TempCrouchMovementSpeed;
+	float TempBaseMovementSpeed;
 
 	// Regular Jump Height
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
@@ -724,8 +739,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
 	USoundCue* AmmoPickupSound;
 
+	// The Quotient determines how much money the Player gets back after selling a Weapon. Base Value is the origin Value of the Weapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Items, meta = (AllowPrivateAccess = "true"))
-	float RetunOfMoneyWhenSalingWeapon;
+	float QuotientOfChangeWhenSellingWeapon;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FVector StartPosition;
@@ -735,8 +751,7 @@ private:
 	UPROPERTY()
 	FHitZone DetectedHitZone;
 		
-public:	
-		
+public:			
 	// Delegate Binding with an Enemy
 	void CharacterIsDeadDelegateBinding(class AEnemy* Source);
 	// Delegate Binding with a Spawner
@@ -902,10 +917,6 @@ public:
 	// Spawn a Pistol Weapon if the Player has sold all his weapons
 	UFUNCTION(BlueprintCallable)
 	void SpawnBackupWeapon();
-
-	// TEST FUNCTION
-	UFUNCTION()
-	void TimerDelegateTestFunction(int32 Number);
 
 	bool GetCharacterIsDead() { return bCharacterIsDead; };
 

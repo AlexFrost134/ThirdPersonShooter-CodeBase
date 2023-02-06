@@ -20,14 +20,10 @@ AExplosiv::AExplosiv()
 	ExplosionStunChanceFar = 10.f;
 	ExplosionDelay = 0.25f;
 	ExplosionDeviationDelay = 0.25f;
-
 	
 	CurrentHealth = MaxHealth;
 	
 	bShouldDestroyNextTick = false;
-
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName(TEXT("StaticMesh")));
 	//StaticMesh->SetupAttachment(RootComponent);
@@ -36,25 +32,21 @@ AExplosiv::AExplosiv()
 	ExplosionRange->SetSphereRadius(ExplosionRadius, false);
 	ExplosionRange->SetupAttachment(StaticMesh);
 
-	
-
-	
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
 void AExplosiv::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
 void AExplosiv::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-	
+	Super::Tick(DeltaTime);	
 }
-
 
  void AExplosiv::BulletHit_Implementation(FHitResult HitResult, FHitZone& HitZone)
  {
@@ -74,8 +66,6 @@ void AExplosiv::Tick(float DeltaTime)
 	 {
 		UGameplayStatics::ApplyDamage(this, Character->GetEquippedWeapon()->GetWeaponDamage(), HitZone.InstigatorRef->GetInstigatorController(), HitZone.InstigatorRef, UDamageType::StaticClass());
 	 }
-
-
  }
 
  void AExplosiv::PlayDestroySound()
@@ -92,7 +82,6 @@ void AExplosiv::Tick(float DeltaTime)
 	 {
 		 UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticles, GetActorLocation(), FRotator(0.f), true);
 	 }
-
  }
 
  void AExplosiv::CheckforActorWithinExplosionRange()
@@ -102,20 +91,20 @@ void AExplosiv::Tick(float DeltaTime)
 	 ExplosionRange->GetOverlappingActors(ActorInRange);
 	 
 	 // DebugTesting
-	 /*
+#if EDITOR 
 	 FString ArrayContains;
 	 for (int32 i = 0; i < ActorInRange.Num(); i++)
 	 {
 		 // Exclude itself
 		 if (ActorInRange[i] != PointerToSelf)
 		 {
-			 //UE_LOG(CombatLog, Log, TEXT("%s has in reach :%s"), *this->GetActorLabel(), *ActorInRange[i]->GetActorLabel());
+			 UE_LOG(CombatLog, Log, TEXT("%s has in reach :%s"), *this->GetActorLabel(), *ActorInRange[i]->GetActorLabel());
 			 ArrayContains.Append(*ActorInRange[i]->GetActorLabel());
 			 ArrayContains.AppendChar(*TEXT(" | "));
 		 }
 	 }
 	 UE_LOG(CombatLog, Log, TEXT("ArrayContains: %s"), *ArrayContains);
-	*/
+#endif
 
 	 for ( int32 i = 0; i < ActorInRange.Num(); i++)
 	 {
@@ -135,7 +124,6 @@ void AExplosiv::Tick(float DeltaTime)
 	 // TODO: Remove out of Function
 	 // Should not be here, but okey for now
 	 Destroy();
-
  }
 
  void AExplosiv::DealExplosivDamage(IExplosionHitInterface* Interface, AActor* Target)
@@ -160,17 +148,14 @@ void AExplosiv::Tick(float DeltaTime)
 	 {
 		 // Close Damage is Done to 100% every Time
 		 Interface->ExplosionHit_Implementation(ExplosionDamageClose, ExplosionStunChanceClose);
-	 }
-
-	 
+	 } 
  }
 
  float AExplosiv::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventIstigator, AActor* DamageCauser)
- {
-	 
-	 // When Takind Damage through a Bullet or Melee attack, the time to explode is reduced
-	 ExplosionDeviationDelay = 0.01f;
-	 ExplosionDelay = 0.01f;
+ {	 
+	// When Takind Damage through a Bullet or Melee attack, the time to explode is reduced
+	ExplosionDeviationDelay = 0.01f;
+	ExplosionDelay = 0.01f;
 	HandleDamage(DamageAmount);
 	return DamageAmount;
  }
@@ -178,7 +163,9 @@ void AExplosiv::Tick(float DeltaTime)
  void AExplosiv::ExplosionHit_Implementation(float Damage, float StunChance)
  {
 	 HandleDamage(Damage);
-	 //UE_LOG(CombatLog, Log, TEXT("%s Got Hit for %f by ExplosionDamage"), *this->GetActorLabel(), Damage);
+#if EDITOR 
+	UE_LOG(CombatLog, Log, TEXT("%s Got Hit for %f by ExplosionDamage"), *this->GetActorLabel(), Damage);
+#endif
  }
 
  void AExplosiv::HandleDamage(float Damage)
@@ -202,8 +189,7 @@ void AExplosiv::Tick(float DeltaTime)
 		 bShouldDestroyNextTick = true;
 		 PlayDestroySound();
 		 EmmitDestroyEffect();
-		 ExplodeTimer();
-		
+		 ExplodeTimer();		
  }
 
  void AExplosiv::ExplodeTimer()
@@ -215,5 +201,4 @@ void AExplosiv::Tick(float DeltaTime)
 	 ExplosionDeviation = FMath::Clamp(ExplosionDelay, 0.05f, 0.5f);
 	 ExplosionDelay += ExplosionDeviation;
 	 GetWorldTimerManager().SetTimer(ExplosionDelayTimerHandle, this, &AExplosiv::CheckforActorWithinExplosionRange, ExplosionDelay);
-
  }

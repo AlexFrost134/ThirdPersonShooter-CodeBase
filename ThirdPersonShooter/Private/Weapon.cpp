@@ -8,8 +8,6 @@
 #include "Sound/SoundCue.h"
 #include "ShooterCharacter.h"
 
-//	#include "Components/SkeletalMeshComponent.h"
-
  AWeapon::AWeapon()
 {
 	ThrowWeaponTime = 1.2f;
@@ -17,17 +15,14 @@
 	AmmunitionInMagazin = 30;
 	MagazineCapacity = 30;
 	AmmunitionFireCost = 1;
-	//Mesh = GetItemMesh(); // PACKAGING moved to beginplay
-
 	BoneToHide = TEXT("");
+
 	// PistolSlide
 	SlideDisplacement = 0.f;
 	SlideDisplacementTime = 0.15f;
 	bMovingSlide = false;
 	SlideDisplacementMaxValue = 3.f;
 	
-
-
 	// WeaponRecoil
 	bGunHasRecoil = false;
 	bCalculatedRecoilRandomAmount = false;
@@ -59,8 +54,6 @@
 
 	// If true allows the Manuel adjustment in PIE of the following Variable
 	bOverrideWeaponProperties = false;
-	
-
 }
 
  void AWeapon::Tick(float DeltaTime)
@@ -115,7 +108,6 @@
 		 case EWeaponType::EWT_HeavyPistol:
 			 Row = WeaponDataTable->FindRow<FWeaponDataTable>(TEXT("HeavyPistol"), TEXT(""));
 			 break;
-
 		 }
 	 }
 
@@ -173,13 +165,10 @@
 			 LuckyHitChance = Row->LuckyHitChance;
 			 LuckyHitMultiplier = Row->LuckyHitMultiplier;
 		 }
-		 
-
 	 }
 
 	 // Needs to be called after reading form DataTable
 	 Super::OnConstruction(Transform);
-
  }
 
 
@@ -216,7 +205,6 @@
 
  void AWeapon::ReadFromItemPropertiesDataTable()
  {
-
 	 if (ItemRarityDataTable)
 	 {
 		 FItemRarityTable* Row = nullptr;
@@ -246,11 +234,9 @@
 		 case EItemRarity::EIR_Default:
 			 Row = ItemRarityDataTable->FindRow<FItemRarityTable>(TEXT("Damaged"), TEXT(""));
 			 break;
-
 		 }
 		 if (Row)
 		 {
-
 			 // Assign Variables with Values form the DataTable
 			 GlowColor = Row->GlowColor;
 			 LightColor = Row->LightColor;
@@ -259,16 +245,12 @@
 			 IconBackground = Row->IconBackground;
 			 CustomDepthStencil = Row->CustomDepthStencil;
 
-
-
 			 // Set Stencile Value, depending form the Value of the DataTable
 			 if (GetItemMesh())
 			 {
 				 GetItemMesh()->SetCustomDepthStencilValue(CustomDepthStencil);
 			 }
-
 		 }
-
 	 }
 
 	 CreateDynamicMaterial();
@@ -298,7 +280,6 @@
 		 case EWeaponType::EWT_HeavyPistol:
 			 Row = WeaponDataTable->FindRow<FWeaponDataTable>(TEXT("HeavyPistol"), TEXT(""));
 			 break;
-
 		 }
 	 }
 
@@ -341,10 +322,7 @@
 		 GetItemMesh()->SetMaterial(PreviousMaterialIndex, nullptr);
 
 		 SetMaterialIndex(Row->MaterialIndex);
-
-
 	 }
-
  }
 
  void AWeapon::ReadFromTierDataTable()
@@ -353,7 +331,6 @@
 
 	 if (WeaponTierDataTable)
 	 {
-
 		 switch (ItemRarity)
 		 {
 		 case EItemRarity::EIR_Damaged:
@@ -479,87 +456,22 @@
 	// Compensate SideEffects that happends due to applying force to the Mesh.
 	GetRootComponent()->SetWorldLocation(Mesh->GetComponentLocation(), false, nullptr, ETeleportType::None);
 	Mesh->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
-	//SetbLocalRotationResetDone(false);
-	
+		
 	// Makes the PulseTimer run and makes the pulse effect visible
 	StartPulseTimer();
-
 }
-
-/* Deprecated
-void AWeapon::SetGlowMaterialProperties()
-{
-	
-	if (GetDynamicMaterialInstance())
-	{
-		// Grey ColourVector
-		FVector4 GreyColourVector = FVector4(0.576389f, 0.574319f, 0.463313f, 1.f);
-		// Blue ColourVector
-		FVector4 BlueColourVector = FVector4(0.f, 0.439998f, 1.f, 1.f);
-		// Green ColourVector
-		FVector4 GreenColourVector = FVector4(0.04861f, 1.f, 0.206638f, 1.f);
-		// Magenta ColourVector
-		FVector4 MagentaColourVector = FVector4(1.f, 0.f, 0.795009f, 1.f);
-		// Orange ColourVector
-		FVector4 OrangeColourVector = FVector4(1.f, 0.268264f, 0.f, 1.f);
-		// Grey ColourVector
-		GreyColourVector = FVector4(0.576389f, 0.574319f, 0.463313f, 1.f);
-
-		switch (GetItemRarity())
-		{
-		case EItemRarity::EIR_Damaged:
-			
-			GetDynamicMaterialInstance()->SetVectorParameterValue(TEXT("FresnelColour"), GreyColourVector);
-			break;
-
-		case EItemRarity::EIR_Common:
-			
-			GetDynamicMaterialInstance()->SetVectorParameterValue(TEXT("FresnelColour"), GreenColourVector);
-			break;
-
-		case EItemRarity::EIR_Uncommon:
-			
-			GetDynamicMaterialInstance()->SetVectorParameterValue(TEXT("FresnelColour"), BlueColourVector);
-			break;
-
-		case EItemRarity::EIR_Rare:
-			
-			GetDynamicMaterialInstance()->SetVectorParameterValue(TEXT("FresnelColour"), MagentaColourVector);
-			break;
-
-		case EItemRarity::EIR_Epic:
-			
-			GetDynamicMaterialInstance()->SetVectorParameterValue(TEXT("FresnelColour"), OrangeColourVector);
-			break;
-
-		case EItemRarity::EIR_Default:
-			
-			GetDynamicMaterialInstance()->SetVectorParameterValue(TEXT("FresnelColour"), GreyColourVector);
-			break;
-
-		default:
-			break;
-		}
-			
-	}
-}
-*/
-
-
 
 void AWeapon::HideBones()
-{
-	
-		 GetItemMesh()->HideBoneByName(BoneToHide, EPhysBodyOp::PBO_None);
+{	
+	GetItemMesh()->HideBoneByName(BoneToHide, EPhysBodyOp::PBO_None);
 
-		 if (false)
-		 {
-			 bool bState = GetItemMesh()->IsBoneHidden(GetItemMesh()->GetBoneIndex(BoneToHide));
-			 FString Text = BoneToHide.ToString();
+	if (false)
+	{
+		bool bState = GetItemMesh()->IsBoneHidden(GetItemMesh()->GetBoneIndex(BoneToHide));
+		FString Text = BoneToHide.ToString();
 
-			 UE_LOG(LogTemp, Warning, TEXT("%s Bone is Hidden %s"), *Text, bState ? TEXT("True") : TEXT("False"));
-
-		 }
+		UE_LOG(LogTemp, Warning, TEXT("%s Bone is Hidden %s"), *Text, bState ? TEXT("True") : TEXT("False"));
+	}
 }
 
 void AWeapon::FinishMovingSlide()
@@ -578,14 +490,12 @@ void AWeapon::UpdateSildeDisplacement()
 	{
 		float TimerElapsedTime = GetWorldTimerManager().GetTimerElapsed(SlideTimerHandle);
 		const float CurrentCurveValue = SlideDisplacementCurve->GetFloatValue(TimerElapsedTime);
-		SlideDisplacement = SlideDisplacementMaxValue * CurrentCurveValue;
-				
+		SlideDisplacement = SlideDisplacementMaxValue * CurrentCurveValue;				
 	}
 }
 
 void AWeapon::UpdateWeaponRecoilRotation(float DeltaTime)
-{
-		
+{		
 	if (bGunHasRecoil)
 	{
 		// Only Calculate a Random Value once, when gun is fired
@@ -624,8 +534,6 @@ void AWeapon::UpdateWeaponRecoilRotation(float DeltaTime)
 		RecoilRotationZ = FMath::FInterpTo(RecoilRotationZ, 0.f, DeltaTime, 30.f);
 		bCalculatedRecoilRandomAmount = false; // Allow generating Random Number again.
 	}
-
-
 }
 
 

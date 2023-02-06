@@ -9,5 +9,4 @@ enum class EAmmoType : uint8
 	EAT_SMG		UMETA(Displayname = "SMG"),
 	EAT_INFINITE UMETA(Displayname = "Infinite"),
 	EAT_Default	UMETA(Displayname = "Default")
-
 };

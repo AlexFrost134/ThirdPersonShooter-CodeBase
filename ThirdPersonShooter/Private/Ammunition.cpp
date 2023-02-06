@@ -20,7 +20,7 @@ AAmmunition::AAmmunition()
 	AmmoCollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Auto PickUpRange"));
 	AmmoCollisionSphere->SetupAttachment(RootComponent);
 	AmmoCollisionSphere->SetSphereRadius(AutoPickUpRange);
-
+	
 }
 
 void AAmmunition::Tick(float DeltaTime)
@@ -40,7 +40,6 @@ void AAmmunition::BeginPlay()
 void AAmmunition::SetItemProperties(EItemState state)
 {
 	Super::SetItemProperties(state);
-
 
 	switch (state)
 	{
@@ -76,7 +75,6 @@ void AAmmunition::SetItemProperties(EItemState state)
 		break;
 
 	case EItemState::EIS_EquipInterping:
-		
 		// Set Mesh Properties
 		Mesh->SetSimulatePhysics(false);
 		Mesh->SetVisibility(true);
@@ -87,6 +85,13 @@ void AAmmunition::SetItemProperties(EItemState state)
 
 	case EItemState::EIS_Carrying:
 		break;
+
+	default:
+	#if EDITOR 
+		UE_LOG(ItemLog, Warning, TEXT("Default Case Hit on s%"), *GetActorLabel());
+	#endif
+		break;
+
 	}
 }
 

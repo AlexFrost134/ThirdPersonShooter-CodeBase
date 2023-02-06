@@ -85,6 +85,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true"))
 	float MeshRandomSpawnDeviationMin;
 
+	// The Power the Items get throw away from the Enemy
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true"))
+	float ForceSize;
+
 	// The Max Scale Value of the Mesh when Spawned
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true"))
 	float MeshRandomSpawnDeviationMax;
@@ -94,15 +98,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true"))
 	float MeshMaxScaleSize;
 
-	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TSoftClassPtr<ADroppableItem> SoftClassPtrToHealth;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TSoftClassPtr<ADroppableItem> SoftClassPtrToCash;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TSoftClassPtr<ADroppableItem> SoftClassPtrToAmmo;*/
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Loot", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AAmmoDrop> AmmoDrop;
 
@@ -111,8 +106,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Loot", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AHealthDrop> HealthDrop;
-
-
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true", ClampMin = 0.f, ClampMax = 100.f))
 	float ItemDropChance;

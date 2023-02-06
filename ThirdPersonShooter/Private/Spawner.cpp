@@ -12,10 +12,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 
-
-
-
-
 // Sets default values
 ASpawner::ASpawner()
 {
@@ -37,8 +33,7 @@ ASpawner::ASpawner()
 	SpawnDelayAfterPreSpawnEffect = 3.f;
 	CurrentLevel = 1;
 	StartLevel = 1;
-
-	
+		
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -47,11 +42,7 @@ ASpawner::ASpawner()
 	SetRootComponent(MaxSpawnArea);
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName(TEXT("DebugMesh2")));
-	StaticMesh->SetupAttachment(MaxSpawnArea);
-
-	
-
-	
+	StaticMesh->SetupAttachment(MaxSpawnArea);	
 }
 
 // Called when the game starts or when spawned
@@ -62,21 +53,7 @@ void ASpawner::BeginPlay()
 	// Spawn Parameters
 	Parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-
-	// GetCurentLevel as Parameter
-	// SetUpLevelSpawn(StartLevel);
-
 	StoreRefToPlayer();
-
-	//bSpawnEntityIsValid = MiniEnemy.IsValid();
-	//ensureMsgf(MiniEnemy, TEXT("%s SoftPointer to Enemy Class is Invalid!, please set References in Blueprint"), *GetActorLabel());
-	
-	//{
-	//	// Spawn Enemy shorty after spawning the Player, later taken care by level start and level end.
-	//	FTimerHandle IntitalSpawnDelayHandle;
-	//	float IntitalSpawnDelayTime = 0.1f;
-	//	GetWorldTimerManager().SetTimer(IntitalSpawnDelayHandle, this, &ASpawner::StartWave, IntitalSpawnDelayTime, false);
-	//}
 
 	// Register Delegate
 	RegisterCharacterIsDeadDelegate();
@@ -84,8 +61,7 @@ void ASpawner::BeginPlay()
 	RegisterSelfOnPlayerController();
 
 	InitzializeEnemyArray();
-	SetUpLevelSpawn(StartLevel);
-		
+	SetUpLevelSpawn(StartLevel);		
 }
 
 void ASpawner::RegisterSelfOnPlayerController()
@@ -97,21 +73,18 @@ void ASpawner::RegisterSelfOnPlayerController()
 	}
 }
 
-
 void ASpawner::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
 	// Create a DebugBox with in the MaxSpawnArea
-	DrawDebugSolidBox(GetWorld(), GetActorLocation(), MaxSpawnArea->GetScaledBoxExtent(), FColor::Blue);
-		
+	DrawDebugSolidBox(GetWorld(), GetActorLocation(), MaxSpawnArea->GetScaledBoxExtent(), FColor::Blue);		
 }
 
 // Called every frame
 void ASpawner::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-	
+	Super::Tick(DeltaTime);	
 }
 
 UClass* ASpawner::ChooseEnemyToSpawn()
@@ -123,20 +96,16 @@ UClass* ASpawner::ChooseEnemyToSpawn()
 		UClass* TempReturn = ListOfEnemyToSpawn[RandomNumber];
 		ListOfEnemyToSpawn.RemoveAt(RandomNumber);
 		return TempReturn;
-	}
-	
+	}	
 	
 	return nullptr;
-
 }
 
 void ASpawner::SetUpLevelSpawn(int32 CurrenLevel)
-{
-			
+{			
 	EnemySpawnAmount = EnemyArray[CurrenLevel - 1].AmountOfMiniEnemy + EnemyArray[CurrenLevel - 1].AmountOfStandardEnemy + EnemyArray[CurrenLevel - 1].AmountOfBigEnemy;
 
-	AddEnemyToList(EnemyArray[CurrenLevel - 1].AmountOfMiniEnemy, EnemyArray[CurrenLevel - 1].AmountOfStandardEnemy, EnemyArray[CurrenLevel - 1].AmountOfBigEnemy);
-		
+	AddEnemyToList(EnemyArray[CurrenLevel - 1].AmountOfMiniEnemy, EnemyArray[CurrenLevel - 1].AmountOfStandardEnemy, EnemyArray[CurrenLevel - 1].AmountOfBigEnemy);		
 }
 
 void ASpawner::InitzializeEnemyArray()
@@ -161,7 +130,6 @@ void ASpawner::AddEnemyToList(int32 MiniEnemyCount, int32 StandardEnemyCount, in
 	{
 		for (size_t i = 0; i < MiniEnemyCount; i++)
 		{
-
 			ListOfEnemyToSpawn.Add(SmallEnemy.Get());
 		}
 	}
@@ -181,7 +149,6 @@ void ASpawner::AddEnemyToList(int32 MiniEnemyCount, int32 StandardEnemyCount, in
 			ListOfEnemyToSpawn.Add(BigEnemy.Get());
 		}
 	}
-
 }
 
 void ASpawner::StartWave()
@@ -202,10 +169,8 @@ void ASpawner::StartWave()
 			// Timer that takes care of Spawing
 			SpawnDeviation = FMath::FRandRange(2.f, 4.f) + SpawnTime;
 			SpawnDeviation = FMath::Clamp(SpawnDeviation, 2.f, 5.f);
-		}
-			
-			GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ASpawner::SpawnControll, SpawnDeviation, false);
-				
+		}			
+		GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ASpawner::SpawnControll, SpawnDeviation, false);				
 	}
 	
 }
@@ -239,22 +204,18 @@ void ASpawner::SpawnControll()
 				// Decrement EnemySpawnAmount
 				DecrementEnemySpawnAmount();
 
-
 				// All Enemy Spawned
 				if (EnemySpawnAmount == 0)
 				{
 					bWaveFinished = true;
 				}
 			}
-
-		}
-		
+		}		
 	}
 	if (bWaveFinished)
 	{
 		// NO more Spawning
-		StopSpawnTimerHandle();
-				
+		StopSpawnTimerHandle();				
 	}
 	else
 	{
@@ -377,11 +338,8 @@ void ASpawner::Callback_SpawnMiniEnemy(FVector SpawnLocation, UClass* ClassToSpa
 				WaveTimerStarted = true;
 
 			}
-		}
-		
-
+		}		
 	}
-
 }
 
 FVector ASpawner::CalculateSpawnCordinates()
@@ -403,7 +361,6 @@ FVector ASpawner::CalculateSpawnCordinates()
 		DrawDebugCone(GetWorld(), SpawnLocation, FVector(.0f, .0f, .1f), 150.f, FMath::DegreesToRadians(30.f), FMath::DegreesToRadians(30.f), 10, FColor::Red, false, 5.f);
 		DrawDebugCircle(GetWorld(), PlayerPosition, SpawnSafeRadius, 36, FColor::Green, false, SpawnTime, 0, 3.f, FVector(0.f, 1, 0),FVector(1,0,0));
 	}
-
 	return SpawnLocation;
 }
 
@@ -503,9 +460,10 @@ void ASpawner::RegisterCharacterIsDeadDelegate()
 
 void ASpawner::MainCharacterIsDead(bool State)
 {
-	//FString Name = GetActorLabel();
-
-	//UE_LOG(DelegateLog, Log, TEXT("MainCharacterIsDead has been called! on %s"), *Name);
+#if EDITOR 
+	FString Name = GetActorLabel();
+	UE_LOG(DelegateLog, Log, TEXT("MainCharacterIsDead has been called! on %s"), *Name);
+#endif
 
 	bMainCharacterIsDead = true;
 	

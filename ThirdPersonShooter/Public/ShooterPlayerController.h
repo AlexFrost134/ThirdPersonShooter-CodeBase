@@ -46,6 +46,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Widgets, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class UUserWidget> HUDOverlayClass;
 
+	// EndScreenWidget
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Widgets, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> EndScreenWidget;
+
+	// Instance of EndScreenWidget
+	UPROPERTY()
+	UUserWidget* EndScreenWidgetInstance;
+
 	// Variable to holds the HUD Overlay Widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Widgets, meta = (AllowPrivateAccess = "true"))
 	UUserWidget* HUDOverlay;
@@ -61,7 +69,6 @@ private:
 
 	// Ref to the Spawner in the Level
 	class ASpawner* LevelSpawner = nullptr;
-		
 
 
 public:
@@ -114,5 +121,8 @@ public:
 
 	// Start Wave Timer just when the first Enemy spawned
 	void StartWaveTimer();
+
+	// Create EndScreen and show to the PlayerViewport, also set UI Inpute Mode and Show Mouse Cursor
+	void ShowEndScreen_Lost();
 
 };

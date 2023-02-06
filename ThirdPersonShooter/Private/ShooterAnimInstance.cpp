@@ -11,8 +11,7 @@
 
 
 UShooterAnimInstance::UShooterAnimInstance()
-{
-	
+{	
 	LastMovementOffsetYaw = 0.f;
 	MovementOffsetYaw = 0.f;
 	bAiming = false;
@@ -37,7 +36,6 @@ UShooterAnimInstance::UShooterAnimInstance()
 void UShooterAnimInstance::NativeInitializeAnimation()
 {
 	ShooterCharacter = Cast<AShooterCharacter>(TryGetPawnOwner());
-
 }
 
 void UShooterAnimInstance::TurnInPlace()
@@ -146,17 +144,11 @@ void UShooterAnimInstance::NativeUpdateAnimation(float Deltatime)
 		ShouldUseFABRIK();
 
 		// Sync Weapon Type
-		SyncWeaponType();
+		SyncWeaponType();	
 
 		
-
-		
-					
-			
-		
-
-		/*
 		// Debug
+		/*
 		FString RotationMessage = FString::Printf(TEXT("Base Aim Rotation %f"), AimRotation.Yaw);
 		FString MovementRotationMessage = FString::Printf(TEXT("Movement Rotation %f"), MovementRotation.Yaw);
 		FRotator NonNormalizedRotation = MovementRotation - AimRotation;
@@ -213,7 +205,6 @@ void UShooterAnimInstance::SyncReloadingState()
 {
 	// Set CombatState
 	ECombatState::ECS_Reloading == ShooterCharacter->GetCombatState() ? bReloading = true : bReloading = false;
-
 }
 
 void UShooterAnimInstance::SyncSpeed()
@@ -227,9 +218,8 @@ void UShooterAnimInstance::SyncSpeed()
 
 void UShooterAnimInstance::SyncIsCharacterInAir()
 {
-	//Is the Character in the air?
+	// Is the Character in the air?
 	bIsInAir = ShooterCharacter->GetCharacterMovement()->IsFalling();
-
 }
 
 void UShooterAnimInstance::SyncIsAccelerating()
@@ -253,8 +243,8 @@ void UShooterAnimInstance::SyncStraving()
 	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(ShooterCharacter->GetVelocity());
 
 	// Difference between AimingRotaion and MovementRotation
-	MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw;  //Straving Right Positiv Value, Straiving Left Negativ Value
-
+	//Straving Right Positiv Value, Straiving Left Negativ Value
+	MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw;  
 }
 
 void UShooterAnimInstance::SyncAimingState()
@@ -262,6 +252,7 @@ void UShooterAnimInstance::SyncAimingState()
 	// Get Aiming State from ShooterCharacter
 	bAiming = ShooterCharacter->GetAimingState();
 }
+
 void UShooterAnimInstance::SetOffsetState()
 {
 	if (bReloading)

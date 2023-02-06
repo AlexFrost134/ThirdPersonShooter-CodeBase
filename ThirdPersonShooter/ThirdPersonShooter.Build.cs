@@ -18,6 +18,10 @@ public class ThirdPersonShooter : ModuleRules
 		// Magic Command That make the Complize not rationalizing the code. so all Variables can be watched :)
 		OptimizeCode = CodeOptimization.Never;
 
+		// Mandatory for compiling with '#if EDITOR' Macro,
+		// Unsure about other sideeffects?!
+		bEnableUndefinedIdentifierWarnings = false;
+
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 

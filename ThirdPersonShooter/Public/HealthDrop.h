@@ -42,9 +42,5 @@ private:
 
 	// The Radius of the PickupSphere
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup", meta = (AllowPrivateAccess = "true"))
-	float PickUpRange;
-
-
-
-	
+	float PickUpRange;	
 };

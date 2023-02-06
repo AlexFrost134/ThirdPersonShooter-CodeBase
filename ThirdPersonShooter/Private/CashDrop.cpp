@@ -43,7 +43,9 @@ void ACashDrop::DoItemRoutine()
 	}
 	else
 	{
-		//UE_LOG(ItemLog, Warning, TEXT("%s: in ACashDrop::DoItemRoutine(), Could not send cash to PlayerCharacter!"), *this->GetActorLabel());
+	#if EDITOR 
+		UE_LOG(ItemLog, Warning, TEXT("%s: in ACashDrop::DoItemRoutine(), Could not send cash to PlayerCharacter!"), *this->GetActorLabel());
+	#endif
 	}
 
 	Destroy();
@@ -54,15 +56,12 @@ void ACashDrop::ChangeMeshSizeByCashValue(int32 InCashValue)
 {
 	if (GetStaticMeshComponent())
 	{
+		// Increase Scale by CashValue
 		float ValueX = FMath::Clamp((GetStaticMeshComponent()->GetComponentScale().X + InCashValue * 0.075), 0.3f, GetMeshMaxScaleSize());
 		float ValueY = FMath::Clamp((GetStaticMeshComponent()->GetComponentScale().Y + InCashValue * 0.075), 0.3f, GetMeshMaxScaleSize());
 		float ValueZ = FMath::Clamp((GetStaticMeshComponent()->GetComponentScale().Z + InCashValue * 0.075), 0.3f, GetMeshMaxScaleSize());
-
-		// Increase Scale by 10% for each CashValue
-		GetStaticMeshComponent()->SetWorldScale3D(FVector(ValueX, ValueY, ValueZ));
-
-		
-		
+				
+		GetStaticMeshComponent()->SetWorldScale3D(FVector(ValueX, ValueY, ValueZ));	
 	}
 }
 
@@ -86,8 +85,5 @@ void ACashDrop::IncreaseCashValueByChance(float Chance)
 			// Nothing
 		}
 	}
-
-	
-
 }
 

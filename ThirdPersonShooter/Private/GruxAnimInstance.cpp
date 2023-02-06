@@ -11,8 +11,7 @@ UGruxAnimInstance::UGruxAnimInstance()
 
 void UGruxAnimInstance::NativeInitializeAnimation()
 {
-	Enemy = Cast<AEnemy>(GetOwningActor());
-	
+	Enemy = Cast<AEnemy>(GetOwningActor());	
 }
 
 void UGruxAnimInstance::NativeUpdateAnimation(float Deltatime)

@@ -26,19 +26,19 @@ protected:
 
 	// Particle that spawn when hit by bullets
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effects", meta = (AllowPrivateAccess = "true"))
-		class UParticleSystem* DefaultImpactParticles;
+	class UParticleSystem* DefaultImpactParticles;
 
 	// Scale Vector of the DefaultImpactParticles. Default Value 1.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effects", meta = (AllowPrivateAccess = "true", ClampMin = "0.01", UIMin = "0.01"))
-		FVector ImpactParticlesSize;
+	FVector ImpactParticlesSize;
 
 	// Sound to play when hit
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
-		class USoundCue* ImpactSound;
+	class USoundCue* ImpactSound;
 
 	// Current Amount of Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
-		float CurrentHealth;
+	float CurrentHealth;
 
 	// Maximal Amount of Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
@@ -49,12 +49,11 @@ protected:
 
 	// The Speed of which the Enemy moves
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
-		float DefaultMovementSpeed;
+	float DefaultMovementSpeed;
 	
 	// Name of the HeadBone
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
-		FName HeadBoneName;
-
+	FName HeadBoneName;
 	
 	int32 AmountofLoot;
 
@@ -66,15 +65,15 @@ protected:
 
 	// Distance of the AcceptanceRadius
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-		float AIAcceptableRadius;
+	float AIAcceptableRadius;
 
 	// Collision Volume for the right weapon
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Collision", meta = (AllowPrivateAccess = "true"))
-		class UBoxComponent* RightWeaponCollisionBox;
+	class UBoxComponent* RightWeaponCollisionBox;
 
 	// Collision Volume for the left weapon
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Collision", meta = (AllowPrivateAccess = "true"))
-		UBoxComponent* LeftWeaponCollisionBox;
+	UBoxComponent* LeftWeaponCollisionBox;
 
 	//FTimerHandle ShowHealthBarTimer;
 
@@ -93,46 +92,46 @@ protected:
 	//  Time for Displaying HealthAmount 
 	// Should has the same Amount as ShowHealthbarforTimeX
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
-		float ShowHealthAmountForTimeX;
+	float ShowHealthAmountForTimeX;
 
 	//  Time for Displaying Healthbar
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
-		float ShowHealthbarForTimeX;
+	float ShowHealthbarForTimeX;
 
 	float HalfMontageSectionTime;
 
 	// If true, UI shows HealthBar
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
-		bool bShowHealthBar;
+	bool bShowHealthBar;
 
 	// If true, UI shows HealthAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
-		bool bShowHealthAmount;
+	bool bShowHealthAmount;
 
 	// If true, allows to play Hitmontage, Prevents playspamming HitMontage
 	bool bCanPlayHitMontage;
 
 	// Montage containing Hit and Death Animation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
-		UAnimMontage* HitMontage;
+	UAnimMontage* HitMontage;
 
 	// Montage containing Attack Animation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
-		UAnimMontage* AttackMontage;
+	UAnimMontage* AttackMontage;
 
 	// Death Montage containing die Animations
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
-		UAnimMontage* DeathMontage;
+	UAnimMontage* DeathMontage;
 
 	// Blend InTime of the AttackMontage; Default = 0.25f
 	// Can be lowered if the Animation plays to fast, if Animiation play fine no need to lower the Value
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true", ClampMin = "0.0", UIMin = "0.0"))
-		float AttackMontageBlendInTime;
+	float AttackMontageBlendInTime;
 
 	// Blend OutTime of the AttackMontage; Default = 0.25f
 	// Can be lowered if the Animation plays to fast, if Animiation play fine no need to lower the Value
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true", ClampMin = "0.0", UIMin = "0.0"))
-		float AttackMontageBlendOutTime;
+	float AttackMontageBlendOutTime;
 
 	// Array that hold the Animation sections names 
 	TArray<FName> AttackMontageSections;
@@ -185,69 +184,69 @@ protected:
 
 	// true if the Enemy is stunned, if true Enemy should not move
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		bool bStunned;
+	bool bStunned;
 
 	// Target that is beeing Attacked
 	AActor* AttackTarget = nullptr;
 
 	// true when in attack range
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		bool bInAttackRange;
+	bool bInAttackRange;
 
 	// Percentage to resist a stun. Should not be higher than 100.f eq. 100%
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		float StunResistance;
+	float StunResistance;
 
 	// The Chance of this Enemy to Stun the Character when it lands a Hit. Default = 5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		float StunChance;
+	float StunChance;
 
 	// Speed of the AnimationAttack PlaybackSpeed, Defaul 1.f eq. normal Speed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true", ClampMin = "0.1", ClampMax = "5.0", UIMin = "0.1", UIMax = "5.0"))
-		float AttackAnimationSpeed;
+	float AttackAnimationSpeed;
 
 	// If true, the character turns to the Target while attacking.
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		bool bAllowTurntoTargetWhileAttacking;
+	bool bAllowTurntoTargetWhileAttacking;
 
 	// IF true the Character can turn itself;
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		bool bAllowToTurn;
+	bool bAllowToTurn;
 
 	// is True when the Enemy is on AttackCooldown, False if the cooldown is over
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		bool bIsOnAttackCooldown;
+	bool bIsOnAttackCooldown;
 
 	// Time untill the next attack is Allowed.
 	UPROPERTY(EditAnywhere, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		float AttackCooldownTime;
+	float AttackCooldownTime;
 
 	// AttackCooldownTime will be adjusted by the Deviation, a Random deviation is determined before each attack
 	UPROPERTY(EditAnywhere, Category = "Combat", meta = (AllowPrivateAccess = "true", ClampMin = "0.0", UIMin = "0.0", UIMax = "10.0"))
-		float AttackCooldownDeviationMax;
+	float AttackCooldownDeviationMax;
 
 	// AttackCooldownTime will be adjusted by the Deviation, a Random deviation is determined before each attack
 	UPROPERTY(EditAnywhere, Category = "Combat", meta = (AllowPrivateAccess = "true", Clampax = "0.0", UIMin = "-10.0", UIMax = "0.0"))
-		float AttackCooldownDeviationMin;
+	float AttackCooldownDeviationMin;
 
 	// The Calculatet AttackCooldown Deviation
 	float AttackCooldownDeviation;
 
 	// True if AttackAnimation is finished, false if attackanimation is playing. Set in PlayAttackMontage Unset via BlueprintNotify
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		bool bAttackAnimationIsPlaying;
+	bool bAttackAnimationIsPlaying;
 
 	// The Base Damage Amount that the Enemy deals
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
-		float BaseDamage;
+	float BaseDamage;
 
 	// Amount of time, Enemy follows the Character and trys to attack him, ignoring AgressionSphereOverlapping
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		float FollowTimeAfterShoot;
+	float FollowTimeAfterShoot;
 
 	// The Enemy follows the Character despite not beeing within the agressionSphere
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		bool bForceAggressionOnPlayer;
+	bool bForceAggressionOnPlayer;
 
 	// If this is true, this Character is allowed to Damage the Player, set to true as soon as the Player receives Damage
 	// Is set to false, when the attack Animation finishs
@@ -255,17 +254,17 @@ protected:
 
 	// True if the Enemy is dead, False if alive
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		bool bDead;
+	bool bDead;
 
 	UPROPERTY(EditAnywhere, Category = "Effects", meta = (AllowPrivateAccess = "true"))
-		FName LeftWeaponSocket;
+	FName LeftWeaponSocket;
 
 	UPROPERTY(EditAnywhere, Category = "Effects", meta = (AllowPrivateAccess = "true"))
-		FName RightWeaponSocket;
+	FName RightWeaponSocket;
 
 	// DestoryHandle gets called of Amount of Time, if the Enemy dies.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		float DestroyDelayAfterDeath;
+	float DestroyDelayAfterDeath;
 
 	// True if Main Character is Dead
 	bool bMainCharacterIsDead;
@@ -439,6 +438,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void DeactivateRightWeaponCollision();
 
+	// Assure that Current Health is never greater than MaxHealth
+	void EnsureMaxHealthisCurrentHealth();
+
+	// Add Tag to the Enemy
+	void SetEnemyTag();
+
 	// Send ExpierencePoints To Player on Enemy Death
 	// @return returns Amount of Experience Points Send.
 	int32 SendExperienceToPlayer();
@@ -454,8 +459,7 @@ protected:
 	bool RollForStunResistance(float WeaponStunChance = 15.f);
 	
 	// Set the PlayerCharacter as the AggressionTarget 
-	// @params Should be the Player
-	void ForceAgressionOnPlayer(AActor* Victim);
+	void ForceAgressionOnPlayer();
 
 	UFUNCTION(BlueprintCallable)
 	void SetStunned(bool Stunned);
